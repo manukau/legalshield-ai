@@ -1,27 +1,25 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Perbaikan: Menggunakan import.meta.env.VITE_API_KEY
-// Pastikan environment variable di Vercel bernama: VITE_API_KEY
+// KODE BARU YANG LEBIH STABIL:
+// Kita menggunakan 'import.meta.env.VITE_API_KEY'
+// Pastikan di Vercel namanya sudah diganti jadi VITE_API_KEY
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
 
 export const analyzeDocument = async (text: string) => {
   try {
-    // Menggunakan model flash agar cepat dan hemat kuota
+    // Menggunakan model flash agar cepat
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
-    Bertindaklah sebagai Senior Legal Advisor.
-    Analisis teks kontrak/dokumen berikut ini untuk mencari risiko hukum bagi orang awam.
+    Bertindaklah sebagai Senior Legal Advisor. 
+    Analisis teks berikut ini untuk mencari risiko hukum bagi orang awam.
     
-    DOKUMEN:
+    TEKS DOKUMEN:
     ${text}
     
-    TUGAS ANDA:
-    Berikan output analisis dalam Bahasa Indonesia yang tegas dan jelas:
-    1. 🛡️ SKOR KEAMANAN (1-10)
-    2. 🚩 RED FLAGS (Daftar pasal berbahaya & alasannya)
-    3. 💰 POTENSI BIAYA TERSEMBUNYI
-    4. ⚖️ KESIMPULAN AKHIR (Aman ditandatangani atau tidak?)
+    TUGAS:
+    Berikan output: (1) Skor Keamanan, (2) Pasal Berbahaya (Red Flags), (3) Potensi Biaya Tersembunyi, (4) Kesimpulan.
+    Gunakan Bahasa Indonesia.
     `;
 
     const result = await model.generateContent(prompt);
