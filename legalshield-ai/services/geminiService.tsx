@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 // Initialize the API client
 // NOTE: In a real production app, you might proxy this through a backend.
 // Here we use the env var directly as per the prompt requirements.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ import.meta.env.VITE_API_KEY });
 
 const SYSTEM_INSTRUCTION = `
 Anda adalah pengacara senior. Tugas Anda adalah mencari pasal berbahaya dalam kontrak sewa/kerjasama. 
@@ -65,3 +65,4 @@ export const analyzeContract = async (file: File): Promise<string> => {
     throw new Error("Gagal melakukan analisa. Pastikan API Key valid dan file adalah PDF.");
   }
 };
+
