@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, AlertTriangle } from 'lucide-react';
 
 interface ResultDisplayProps {
   result: string;
@@ -8,36 +8,77 @@ interface ResultDisplayProps {
 
 export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 p-6 text-white">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <ShieldCheck className="w-8 h-8 text-green-400" />
-          Hasil Analisa LegalShield
-        </h2>
-        <p className="opacity-80 mt-1">Dianalisa oleh LegalShield AI</p>
+    // CONTAINER UTAMA: Ubah bg-white jadi bg-slate-900 (Gelap)
+    <div className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden ring-1 ring-white/10">
+      
+      {/* HEADER BAGIAN ATAS */}
+      <div className="bg-slate-950 p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+            <div className="bg-emerald-500/20 p-2 rounded-lg">
+              <ShieldCheck className="w-6 h-6 text-emerald-400" />
+            </div>
+            Hasil Analisa LegalShield
+          </h2>
+          <p className="text-slate-400 text-sm mt-2 ml-1">
+            Ditenagai oleh Gemini 2.5 Flash AI
+          </p>
+        </div>
       </div>
       
-      <div className="p-8 prose prose-blue max-w-none">
+      {/* ISI KONTEN (MARKDOWN) */}
+      <div className="p-8">
         <ReactMarkdown
           components={{
-            h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-gray-900 mb-4 pb-2 border-b" {...props} />,
-            h2: ({node, ...props}) => <h2 className="text-xl font-bold text-blue-900 mt-6 mb-3 flex items-center gap-2" {...props} />,
-            h3: ({node, ...props}) => <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2" {...props} />,
-            ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-2 text-gray-700 mb-4" {...props} />,
-            li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
-            strong: ({node, ...props}) => <strong className="font-bold text-red-700" {...props} />,
-            p: ({node, ...props}) => <p className="text-gray-700 leading-relaxed mb-4" {...props} />
+            // JUDUL BESAR (H1)
+            h1: ({node, ...props}) => (
+              <h1 className="text-3xl font-extrabold text-white mb-6 pb-4 border-b border-slate-700" {...props} />
+            ),
+            // JUDUL SUB-BAB (H2) - Biasanya untuk "Red Flags" atau "Kesimpulan"
+            h2: ({node, ...props}) => (
+              <h2 className="text-xl font-bold text-emerald-400 mt-8 mb-4 flex items-center gap-2" {...props} />
+            ),
+            // JUDUL KECIL (H3)
+            h3: ({node, ...props}) => (
+              <h3 className="text-lg font-semibold text-slate-200 mt-6 mb-2" {...props} />
+            ),
+            // LIST (Titik-titik)
+            ul: ({node, ...props}) => (
+              <ul className="list-disc pl-5 space-y-3 text-slate-300 mb-6 marker:text-emerald-500" {...props} />
+            ),
+            // LIST ITEM
+            li: ({node, ...props}) => (
+              <li className="leading-relaxed" {...props} />
+            ),
+            // TEKS TEBAL (STRONG) - Kita ganti jadi Merah Terang/Kuning untuk highlight bahaya
+            strong: ({node, ...props}) => (
+              <strong className="font-bold text-rose-400 bg-rose-400/10 px-1 rounded" {...props} />
+            ),
+            // PARAGRAF BIASA
+            p: ({node, ...props}) => (
+              <p className="text-slate-300 leading-relaxed mb-4" {...props} />
+            ),
+            // BLOCKQUOTE (Kutipan Pasal)
+            blockquote: ({node, ...props}) => (
+              <blockquote className="border-l-4 border-slate-600 pl-4 italic text-slate-400 my-4" {...props} />
+            )
           }}
         >
           {result}
         </ReactMarkdown>
       </div>
 
- <div className="mt-8 p-4 bg-slate-900/50 border border-slate-600 rounded-lg text-xs text-slate-500 text-center">
-        <strong>Disclaimer:</strong> Analisis ini dibantu kecerdasan buatan. 
-        Harap verifikasi kembali dengan ahli hukum untuk keputusan krusial.
+      {/* FOOTER DISCLAIMER */}
+      <div className="bg-slate-950/50 p-4 border-t border-slate-800">
+         <div className="flex items-start gap-3 max-w-2xl mx-auto text-xs text-slate-500 text-center sm:text-left">
+            <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5 mx-auto sm:mx-0" />
+            <p>
+              <strong>Disclaimer Penting:</strong> Analisis ini dihasilkan secara otomatis oleh kecerdasan buatan (AI). 
+              Hasil ini hanya untuk tujuan referensi awal dan <u>bukan pengganti nasihat hukum profesional</u>. 
+              Selalu konsultasikan kontrak bernilai tinggi dengan pengacara berlisensi sebelum tanda tangan.
+            </p>
+         </div>
       </div>
     </div>
   );
 };
-
