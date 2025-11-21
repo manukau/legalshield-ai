@@ -1,41 +1,41 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { ShieldCheck } from 'lucide-react';
 
 interface ResultDisplayProps {
   result: string;
-  isLoading: boolean;
 }
 
-const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, isLoading }) => {
-  if (isLoading) {
-    return (
-      <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-        <p className="text-sm text-gray-500 mt-4 text-center">
-          Sedang membaca pasal-pasal kontrak... (Bisa memakan waktu 10-20 detik)
-        </p>
-      </div>
-    );
-  }
-
-  if (!result) return null;
-
+export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
   return (
-    <div className="mt-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-2">
-        📋 Hasil Analisis Hukum
-      </h2>
-      <div className="prose prose-blue max-w-none text-gray-700">
-        <ReactMarkdown>{result}</ReactMarkdown>
+    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 p-6 text-white">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
+          <ShieldCheck className="w-8 h-8 text-green-400" />
+          Hasil Analisa LegalShield
+        </h2>
+        <p className="opacity-80 mt-1">Dianalisa oleh AI Senior Lawyer (Gemini 2.5 Flash)</p>
       </div>
-      <div className="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
-        <strong>Disclaimer:</strong> Analisis ini menggunakan AI dan bukan nasihat hukum profesional. 
-        Selalu konsultasikan keputusan penting dengan pengacara sungguhan.
+      
+      <div className="p-8 prose prose-blue max-w-none">
+        <ReactMarkdown
+          components={{
+            h1: ({node, ...props}) => <h1 className="text-3xl font-bold text-gray-900 mb-4 pb-2 border-b" {...props} />,
+            h2: ({node, ...props}) => <h2 className="text-xl font-bold text-blue-900 mt-6 mb-3 flex items-center gap-2" {...props} />,
+            h3: ({node, ...props}) => <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2" {...props} />,
+            ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-2 text-gray-700 mb-4" {...props} />,
+            li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
+            strong: ({node, ...props}) => <strong className="font-bold text-red-700" {...props} />,
+            p: ({node, ...props}) => <p className="text-gray-700 leading-relaxed mb-4" {...props} />
+          }}
+        >
+          {result}
+        </ReactMarkdown>
+      </div>
+
+      <div className="bg-gray-50 p-4 border-t border-gray-200 text-center text-sm text-gray-500">
+        Disclaimer: Hasil analisa ini dibuat oleh AI dan bukan nasihat hukum resmi. Selalu konsultasikan dengan pengacara manusia untuk keputusan final.
       </div>
     </div>
   );
 };
-
-export default ResultDisplay;
