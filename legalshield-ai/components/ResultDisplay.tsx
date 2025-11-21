@@ -14,7 +14,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
           <ShieldCheck className="w-8 h-8 text-green-400" />
           Hasil Analisa LegalShield
         </h2>
-        <p className="opacity-80 mt-1">Dianalisa oleh AI Senior Lawyer (Gemini 2.5 Flash)</p>
+        <p className="opacity-80 mt-1">Dianalisa oleh LegalShield AI</p>
       </div>
       
       <div className="p-8 prose prose-blue max-w-none">
@@ -33,9 +33,11 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
         </ReactMarkdown>
       </div>
 
-      <div className="bg-gray-50 p-4 border-t border-gray-200 text-center text-sm text-gray-500">
-        Disclaimer: Hasil analisa ini dibuat oleh AI dan bukan nasihat hukum resmi. Selalu konsultasikan dengan pengacara manusia untuk keputusan final.
+ <div className="mt-8 p-4 bg-slate-900/50 border border-slate-600 rounded-lg text-xs text-slate-500 text-center">
+        <strong>Disclaimer:</strong> Analisis ini dibantu kecerdasan buatan. 
+        Harap verifikasi kembali dengan ahli hukum untuk keputusan krusial.
       </div>
     </div>
   );
 };
+
