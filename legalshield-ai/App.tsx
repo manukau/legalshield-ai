@@ -3,7 +3,7 @@ import { FileUploader } from './components/FileUploader';
 import { ResultDisplay } from './components/ResultDisplay';
 import { analyzeContract } from './services/geminiService';
 import { AnalysisStatus } from './types';
-import { Scale, Loader2, CheckCircle2 } from 'lucide-react';
+import { Scale, Loader2, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 const App: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -30,17 +30,22 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
+    // GANTI BACKGROUND UTAMA: bg-slate-950 (Gelap)
+    <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-emerald-500/30 font-sans">
+      
+      {/* Navbar Gelap */}
+      <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10 shadow-lg shadow-black/20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-blue-600 p-2 rounded-lg">
-              <Scale className="text-white w-6 h-6" />
+          <div className="flex items-center gap-3">
+            {/* Ikon Logo: Ganti Biru jadi Emerald */}
+            <div className="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-lg">
+              <ShieldCheck className="text-emerald-400 w-6 h-6" />
             </div>
-            <span className="text-xl font-bold text-gray-900">LegalShield AI</span>
+            <span className="text-xl font-bold text-white tracking-tight">
+              LegalShield <span className="text-emerald-400">AI</span>
+            </span>
           </div>
-          <div className="text-sm font-medium text-gray-500">
+          <div className="text-sm font-medium text-slate-400 hidden sm:block">
             Validasi Ide Bisnis Aman & Cepat
           </div>
         </div>
@@ -50,33 +55,45 @@ const App: React.FC = () => {
         
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-            Analisa Risiko Kontrak Dalam Hitungan Detik
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+            Analisa Risiko Kontrak <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+              Dalam Hitungan Detik
+            </span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Upload draft kontrak sewa atau kerjasama Anda. AI kami akan mencari pasal berbahaya ("Red Flags") dan potensi biaya tersembunyi sebelum Anda tanda tangan.
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Upload draft kontrak sewa atau kerjasama Anda. AI kami akan mencari pasal berbahaya 
+            (<span className="text-red-400 font-semibold">Red Flags</span>) dan potensi biaya tersembunyi sebelum Anda tanda tangan.
           </p>
         </div>
 
         {/* Analysis Flow */}
         <div className="flex flex-col items-center w-full">
           
-          {/* Step 1: Upload */}
-          <FileUploader 
-            selectedFile={file} 
-            onFileSelect={setFile} 
-            disabled={status === AnalysisStatus.ANALYZING}
-          />
+          {/* Step 1: Upload 
+              Catatan: FileUploader mungkin perlu disesuaikan warnanya nanti jika backgroundnya masih putih.
+          */}
+          <div className="w-full max-w-xl">
+             <FileUploader 
+                selectedFile={file} 
+                onFileSelect={setFile} 
+                disabled={status === AnalysisStatus.ANALYZING}
+              />
+          </div>
 
           {/* Step 2: Action Button */}
           {file && status !== AnalysisStatus.COMPLETE && (
-            <div className="mb-12 animate-fade-in-up">
+            <div className="mb-12 mt-8 animate-fade-in-up">
               <button
                 onClick={handleAnalyze}
                 disabled={status === AnalysisStatus.ANALYZING}
                 className={`
-                  group relative flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold text-white rounded-full shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-1
-                  ${status === AnalysisStatus.ANALYZING ? 'bg-blue-400 cursor-wait' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-blue-600/40'}
+                  group relative flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold text-white rounded-full shadow-lg transition-all transform hover:-translate-y-1
+                  ${status === AnalysisStatus.ANALYZING 
+                    ? 'bg-slate-700 cursor-wait text-slate-400' 
+                    // GANTI TOMBOL: Biru jadi Emerald Gradient
+                    : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-900/50 border border-emerald-500/30'
+                  }
                 `}
               >
                 {status === AnalysisStatus.ANALYZING ? (
@@ -92,24 +109,22 @@ const App: React.FC = () => {
                 )}
               </button>
               {status === AnalysisStatus.ANALYZING && (
-                <p className="text-center mt-4 text-sm text-gray-500 animate-pulse">
+                <p className="text-center mt-4 text-sm text-emerald-400 font-mono animate-pulse">
                   Sedang membaca pasal per pasal... (estimasi 10-20 detik)
                 </p>
               )}
             </div>
           )}
 
-          {/* Error Message */}
+          {/* Error Message (Gelap & Merah) */}
           {status === AnalysisStatus.ERROR && (
-            <div className="mb-8 w-full max-w-xl bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+            <div className="mb-8 w-full max-w-xl bg-red-900/20 border border-red-500/50 p-4 rounded-lg backdrop-blur-sm">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
+                  <AlertTriangle className="h-5 w-5 text-red-400" />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-red-700">
+                  <p className="text-sm text-red-200 font-medium">
                     {error}
                   </p>
                 </div>
@@ -120,17 +135,17 @@ const App: React.FC = () => {
           {/* Step 3: Result */}
           {status === AnalysisStatus.COMPLETE && result && (
             <div className="w-full animate-fade-in-up">
-              <ResultDisplay result={result} />
-              <div className="text-center mt-8">
+              <ResultDisplay result={result} isLoading={false} /> {/* isLoading false karena status sudah COMPLETE */}
+              <div className="text-center mt-12 border-t border-slate-800 pt-8">
                 <button
                   onClick={() => {
                     setFile(null);
                     setStatus(AnalysisStatus.IDLE);
                     setResult("");
                   }}
-                  className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                  className="text-slate-400 hover:text-emerald-400 font-medium hover:underline transition-colors flex items-center justify-center gap-2 mx-auto"
                 >
-                  Analisa Kontrak Lain
+                   ↺ Analisa Kontrak Lain
                 </button>
               </div>
             </div>
@@ -142,5 +157,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-
