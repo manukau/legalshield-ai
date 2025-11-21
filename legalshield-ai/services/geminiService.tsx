@@ -1,12 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize the API client
 // Validasi API Key agar user tahu jika lupa memasukkan di Vercel
 const apiKey = process.env.API_KEY;
 
-// Gunakan dummy key jika kosong agar aplikasi tidak crash saat load awal, 
-// tapi nanti akan dicek ulang saat fungsi dipanggil.
-const ai = new GoogleGenAI({ apiKey: apiKey || "DUMMY_KEY" });
+// Inisialisasi AI. Jika apiKey kosong saat build/dev (sebelum di-set di Vercel), 
+// gunakan dummy string agar tidak crash saat inisialisasi awal.
+// Pengecekan asli dilakukan saat fungsi analyzeContract dipanggil.
+const ai = new GoogleGenAI({ apiKey: apiKey || "DUMMY_KEY_FOR_BUILD" });
 
 const SYSTEM_INSTRUCTION = `
 Anda adalah pengacara senior. Tugas Anda adalah mencari pasal berbahaya dalam kontrak sewa/kerjasama. 
@@ -38,20 +38,20 @@ const fileToBase64 = (file: File): Promise<string> => {
 
 export const analyzeContract = async (file: File): Promise<string> => {
   // Cek validitas API Key sebelum request ke Google
-  if (!apiKey || apiKey === "DUMMY_KEY") {
-    throw new Error("API Key tidak ditemukan. Pastikan Anda sudah memasukkan 'API_KEY' di Settings > Environment Variables pada Vercel.");
+  if (!apiKey || apiKey === "DUMMY_KEY_FOR_BUILD" || apiKey.length < 10) {
+    throw new Error("API Key tidak ditemukan atau tidak valid. Pastikan Anda sudah memasukkan 'API_KEY' di Settings > Environment Variables pada Vercel.");
   }
 
   try {
     const base64Data = await fileToBase64(file);
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', // Pastikan menggunakan model 2.5 Flash terbaru
+      model: 'gemini-2.5-flash',
       contents: {
         parts: [
           {
             inlineData: {
-              mimeType: file.type, // Should be 'application/pdf'
+              mimeType: file.type,
               data: base64Data
             }
           },
@@ -71,11 +71,10 @@ export const analyzeContract = async (file: File): Promise<string> => {
   } catch (error: any) {
     console.error("Gemini Analysis Error:", error);
     
-    // Penanganan error spesifik agar user paham
     if (error.message?.includes("404") || error.message?.includes("not found")) {
-      throw new Error("Model AI tidak ditemukan. Pastikan kode sudah menggunakan 'gemini-2.5-flash'.");
+      throw new Error("Model AI tidak ditemukan. Mohon tunggu sebentar dan coba lagi, atau pastikan konfigurasi model sudah benar.");
     }
     
-    throw new Error(error.message || "Gagal melakukan analisa. Pastikan API Key valid dan file adalah PDF.");
+    throw new Error(error.message || "Gagal melakukan analisa. Pastikan file PDF tidak terkunci password.");
   }
 };
