@@ -1,13 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// KODE BARU YANG LEBIH STABIL:
-// Kita menggunakan 'import.meta.env.VITE_API_KEY'
-// Pastikan di Vercel namanya sudah diganti jadi VITE_API_KEY
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
+// @ts-ignore
+const apiKey = import.meta.env.VITE_API_KEY;
 
-export const analyzeDocument = async (text: string) => {
+const genAI = new GoogleGenerativeAI(apiKey);
+
+// PENTING: Nama fungsi ini HARUS 'analyzeContract' agar cocok dengan App.tsx
+export const analyzeContract = async (text: string) => {
   try {
-    // Menggunakan model flash agar cepat
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
@@ -27,6 +27,6 @@ export const analyzeDocument = async (text: string) => {
     return response.text();
   } catch (error) {
     console.error("Error analyzing document:", error);
-    throw error;
+    throw error; // Lempar error agar UI tahu ada masalah
   }
 };
