@@ -20,9 +20,12 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
             </div>
             Hasil Analisa LegalShield
           </h2>
-          <p className="text-slate-400 text-sm mt-2 ml-1">
-            Ditenagai oleh Gemini 2.5 Flash AI
-          </p>
+          <div className="flex items-center gap-2 mt-1 ml-1">
+  <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+  <p className="text-slate-400 text-xs font-mono tracking-widest uppercase opacity-80">
+    POWERED BY ADVANCED NEURAL LOGIC
+  </p>
+</div>
         </div>
       </div>
       
@@ -82,3 +85,4 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
     </div>
   );
 };
+
