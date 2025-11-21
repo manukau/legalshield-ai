@@ -3,7 +3,8 @@ import { FileUploader } from './components/FileUploader';
 import { ResultDisplay } from './components/ResultDisplay';
 import { analyzeContract } from './services/geminiService';
 import { AnalysisStatus } from './types';
-import { Scale, Loader2, CheckCircle2, ShieldCheck } from 'lucide-react';
+// PERBAIKAN 1: Menambahkan AlertTriangle di sini
+import { Scale, Loader2, CheckCircle2, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 const App: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -30,14 +31,13 @@ const App: React.FC = () => {
   };
 
   return (
-    // GANTI BACKGROUND UTAMA: bg-slate-950 (Gelap)
+    // BACKGROUND DARK MODE
     <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-emerald-500/30 font-sans">
       
       {/* Navbar Gelap */}
       <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10 shadow-lg shadow-black/20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {/* Ikon Logo: Ganti Biru jadi Emerald */}
             <div className="bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-lg">
               <ShieldCheck className="text-emerald-400 w-6 h-6" />
             </div>
@@ -70,9 +70,7 @@ const App: React.FC = () => {
         {/* Analysis Flow */}
         <div className="flex flex-col items-center w-full">
           
-          {/* Step 1: Upload 
-              Catatan: FileUploader mungkin perlu disesuaikan warnanya nanti jika backgroundnya masih putih.
-          */}
+          {/* Step 1: Upload */}
           <div className="w-full max-w-xl">
              <FileUploader 
                 selectedFile={file} 
@@ -91,7 +89,6 @@ const App: React.FC = () => {
                   group relative flex items-center justify-center gap-3 px-8 py-4 text-lg font-bold text-white rounded-full shadow-lg transition-all transform hover:-translate-y-1
                   ${status === AnalysisStatus.ANALYZING 
                     ? 'bg-slate-700 cursor-wait text-slate-400' 
-                    // GANTI TOMBOL: Biru jadi Emerald Gradient
                     : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-900/50 border border-emerald-500/30'
                   }
                 `}
@@ -116,11 +113,12 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* Error Message (Gelap & Merah) */}
+          {/* Error Message */}
           {status === AnalysisStatus.ERROR && (
             <div className="mb-8 w-full max-w-xl bg-red-900/20 border border-red-500/50 p-4 rounded-lg backdrop-blur-sm">
               <div className="flex">
                 <div className="flex-shrink-0">
+                  {/* Icon AlertTriangle sekarang sudah aman dipanggil */}
                   <AlertTriangle className="h-5 w-5 text-red-400" />
                 </div>
                 <div className="ml-3">
@@ -135,7 +133,9 @@ const App: React.FC = () => {
           {/* Step 3: Result */}
           {status === AnalysisStatus.COMPLETE && result && (
             <div className="w-full animate-fade-in-up">
-              <ResultDisplay result={result} isLoading={false} /> {/* isLoading false karena status sudah COMPLETE */}
+              {/* PERBAIKAN 2: Menghapus 'isLoading={false}' agar cocok dengan komponenmu */}
+              <ResultDisplay result={result} /> 
+              
               <div className="text-center mt-12 border-t border-slate-800 pt-8">
                 <button
                   onClick={() => {
