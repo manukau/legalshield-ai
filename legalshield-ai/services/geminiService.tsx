@@ -3,9 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 // Validasi API Key agar user tahu jika lupa memasukkan di Vercel
 const apiKey = process.env.API_KEY;
 
-// Inisialisasi AI. Jika apiKey kosong saat build/dev (sebelum di-set di Vercel), 
-// gunakan dummy string agar tidak crash saat inisialisasi awal.
-// Pengecekan asli dilakukan saat fungsi analyzeContract dipanggil.
+// Inisialisasi AI. Jika apiKey kosong saat build/dev, gunakan dummy agar tidak crash di awal.
 const ai = new GoogleGenAI({ apiKey: apiKey || "DUMMY_KEY_FOR_BUILD" });
 
 const SYSTEM_INSTRUCTION = `
@@ -37,9 +35,15 @@ const fileToBase64 = (file: File): Promise<string> => {
 };
 
 export const analyzeContract = async (file: File): Promise<string> => {
-  // Cek validitas API Key sebelum request ke Google
+  // Cek validitas API Key
   if (!apiKey || apiKey === "DUMMY_KEY_FOR_BUILD" || apiKey.length < 10) {
-    throw new Error("API Key tidak ditemukan atau tidak valid. Pastikan Anda sudah memasukkan 'API_KEY' di Settings > Environment Variables pada Vercel.");
+    throw new Error(
+      "API Key belum terpasang. \n\n" +
+      "Solusi untuk Vercel:\n" +
+      "1. Buka Dashboard Vercel > Project Settings > Environment Variables.\n" +
+      "2. Tambahkan Key baru: 'API_KEY' dengan value dari Google AI Studio.\n" +
+      "3. PENTING: Masuk ke menu 'Deployments', klik titik tiga pada deployment terakhir, lalu pilih 'Redeploy' agar variable terbaca."
+    );
   }
 
   try {
@@ -72,7 +76,7 @@ export const analyzeContract = async (file: File): Promise<string> => {
     console.error("Gemini Analysis Error:", error);
     
     if (error.message?.includes("404") || error.message?.includes("not found")) {
-      throw new Error("Model AI tidak ditemukan. Mohon tunggu sebentar dan coba lagi, atau pastikan konfigurasi model sudah benar.");
+      throw new Error("Model AI tidak ditemukan. Mohon tunggu sebentar dan coba lagi.");
     }
     
     throw new Error(error.message || "Gagal melakukan analisa. Pastikan file PDF tidak terkunci password.");
