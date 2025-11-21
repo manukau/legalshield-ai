@@ -51,7 +51,7 @@ const App: React.FC = () => {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-            Analisa Risiko Kontrak dalam Hitungan Detik
+            Analisa Risiko Kontrak Dalam Hitungan Detik
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Upload draft kontrak sewa atau kerjasama Anda. AI kami akan mencari pasal berbahaya ("Red Flags") dan potensi biaya tersembunyi sebelum Anda tanda tangan.
@@ -142,4 +142,5 @@ const App: React.FC = () => {
 };
 
 export default App;
+
 
