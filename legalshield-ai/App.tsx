@@ -55,12 +55,12 @@ const App: React.FC = () => {
         
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-            Analisa Risiko Kontrak <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-              Dalam Hitungan Detik
-            </span>
-          </h1>
+         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+    Analisa Risiko Kontrak <br />
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+      Dalam Hitungan Detik
+    </span>
+  </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Upload draft kontrak sewa atau kerjasama Anda. AI kami akan mencari pasal berbahaya 
             (<span className="text-red-400 font-semibold">Red Flags</span>) dan potensi biaya tersembunyi sebelum Anda tanda tangan.
@@ -157,3 +157,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
