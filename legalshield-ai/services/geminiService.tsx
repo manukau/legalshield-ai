@@ -1,84 +1,83 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Validasi API Key agar user tahu jika lupa memasukkan di Vercel
-const apiKey = process.env.API_KEY;
+// 1. SETUP API KEY (Menggunakan standar Vite)
+// @ts-ignore
+const apiKey = import.meta.env.VITE_API_KEY;
 
-// Inisialisasi AI. Jika apiKey kosong saat build/dev, gunakan dummy agar tidak crash di awal.
-const ai = new GoogleGenAI({ apiKey: apiKey || "DUMMY_KEY_FOR_BUILD" });
+// Inisialisasi Google AI
+const genAI = new GoogleGenerativeAI(apiKey);
 
-const SYSTEM_INSTRUCTION = `
-Anda adalah pengacara senior. Tugas Anda adalah mencari pasal berbahaya dalam kontrak sewa/kerjasama. 
-Berikan output berupa: 
-(1) Skor Keamanan 1-10, 
-(2) Daftar Pasal 'Red Flag' (Berbahaya) dan alasannya, 
-(3) Potensi Biaya Tersembunyi. 
-
-Gunakan bahasa Indonesia yang mudah dimengerti orang awam. 
-Format jawaban dalam Markdown yang rapi dengan heading, bullet points, dan bold text untuk penekanan.
-`;
-
-/**
- * Converts a File object to a Base64 string required by the Gemini API.
- */
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
+// 2. FUNGSI PEMBANTU: Mengubah File PDF jadi data yang bisa dibaca AI
+async function fileToGenerativePart(file: File) {
+  return new Promise<any>((resolve, reject) => {
     const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
+    reader.onloadend = () => {
       const result = reader.result as string;
-      // Remove the Data-URL prefix (e.g., "data:application/pdf;base64,")
-      const base64 = result.split(',')[1];
-      resolve(base64);
+      // Ambil bagian base64-nya saja (setelah tanda koma)
+      const base64String = result.split(',')[1];
+      resolve({
+        inlineData: { data: base64String, mimeType: file.type },
+      });
     };
-    reader.onerror = (error) => reject(error);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
-};
+}
 
-export const analyzeContract = async (file: File): Promise<string> => {
-  // Cek validitas API Key
-  if (!apiKey || apiKey === "DUMMY_KEY_FOR_BUILD" || apiKey.length < 10) {
+// 3. FUNGSI UTAMA: Menganalisa Kontrak
+export const analyzeContract = async (file: File) => {
+  // Cek Darurat: Apakah API Key ada?
+  if (!apiKey || apiKey.length < 10) {
     throw new Error(
-      "API Key belum terpasang. \n\n" +
-      "Solusi untuk Vercel:\n" +
-      "1. Buka Dashboard Vercel > Project Settings > Environment Variables.\n" +
-      "2. Tambahkan Key baru: 'API_KEY' dengan value dari Google AI Studio.\n" +
-      "3. PENTING: Masuk ke menu 'Deployments', klik titik tiga pada deployment terakhir, lalu pilih 'Redeploy' agar variable terbaca."
+      "API Key hilang/rusak. Cek Vercel Environment Variables pastikan namanya VITE_API_KEY"
     );
   }
 
   try {
-    const base64Data = await fileToBase64(file);
+    // Gunakan model terbaru (Gemini 2.5 Flash)
+    // Pastikan nama model sesuai dengan yang tersedia di akunmu
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      // SYSTEM INSTRUCTION (INSTRUKSI BARU YANG AMAN)
+      systemInstruction: `
+      PERAN:
+      Anda adalah Sistem AI Audit Risiko Kontrak (Contract Risk Engine).
+      Tugas Anda adalah memindai dokumen secara objektif.
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              mimeType: file.type,
-              data: base64Data
-            }
-          },
-          {
-            text: "Tolong analisa dokumen ini sesuai instruksi sistem."
-          }
-        ]
-      },
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.4, 
-      }
+      ATURAN PENTING (SAFETY):
+      1. JANGAN PERNAH mengaku sebagai "Pengacara", "Lawyer", atau Manusia.
+      2. Gunakan sudut pandang sistem (Contoh: "Sistem mendeteksi...", "Analisis menunjukkan...").
+      3. Jangan gunakan kalimat "Saran saya...", ganti dengan "Rekomendasi perbaikan...".
+      4. Gunakan Bahasa Indonesia yang lugas dan profesional.
+
+      FORMAT OUTPUT:
+      Berikan laporan audit tegas:
+      1. 🛡️ SKOR KEAMANAN (1-10)
+      2. 🚩 RED FLAGS (Pasal Berbahaya & Alasannya)
+      3. 💰 POTENSI BIAYA TERSEMBUNYI
+      4. ⚖️ KESIMPULAN & REKOMENDASI TEKNIS
+      `
     });
 
-    return response.text || "Maaf, tidak ada hasil analisa yang dihasilkan.";
+    // Proses file PDF
+    const filePart = await fileToGenerativePart(file);
+
+    // Kirim perintah
+    const prompt = "Lakukan audit risiko lengkap pada dokumen yang dilampirkan ini sesuai instruksi sistem.";
+    
+    const result = await model.generateContent([prompt, filePart]);
+    const response = await result.response;
+    
+    return response.text();
 
   } catch (error: any) {
-    console.error("Gemini Analysis Error:", error);
+    console.error("Gemini Error:", error);
     
+    // Penanganan Error yang Ramah
     if (error.message?.includes("404") || error.message?.includes("not found")) {
-      throw new Error("Model AI tidak ditemukan. Mohon tunggu sebentar dan coba lagi.");
+      throw new Error("Model AI sedang sibuk atau versi model tidak ditemukan. Coba refresh.");
     }
     
-    throw new Error(error.message || "Gagal melakukan analisa. Pastikan file PDF tidak terkunci password.");
+    throw new Error("Gagal menganalisa. Pastikan file PDF tidak dikunci password.");
   }
 };
