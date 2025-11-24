@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { ShieldCheck, AlertTriangle, Download, Loader2 } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, Download, Loader2, FileCheck, Copy } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -17,37 +17,25 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
     setIsDownloading(true);
 
     try {
-      // 1. Ambil elemen yang mau difoto
       const element = contentRef.current;
-      
-      // 2. Foto elemen tersebut (High Quality)
       const canvas = await html2canvas(element, {
-        scale: 2, // Biar tajam saat di-zoom
-        backgroundColor: '#0f172a', // Pastikan background tetap gelap (Slate-900)
+        scale: 2,
+        backgroundColor: '#020617', // Slate-950 (Sangat Gelap)
         logging: false,
         useCORS: true
       });
 
-      // 3. Siapkan PDF
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      // 4. Hitung ukuran agar pas di kertas A4
-      const imgWidth = 210; // Lebar A4 dalam mm
-      const pageHeight = 297; // Tinggi A4 dalam mm
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const imgWidth = 210; 
+      const pageHeight = 297; 
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
       let position = 0;
 
-      // 5. Cetak Halaman Pertama
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
-      // 6. Jika panjang, buat halaman baru (Multipage)
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
@@ -55,118 +43,141 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
         heightLeft -= pageHeight;
       }
 
-      // 7. Simpan File
       pdf.save('LegalShield-Audit-Report.pdf');
-
     } catch (error) {
       console.error("Gagal download PDF:", error);
-      alert("Maaf, gagal membuat PDF. Silakan coba lagi.");
+      alert("Maaf, gagal membuat PDF.");
     } finally {
       setIsDownloading(false);
     }
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 animate-fade-in-up">
       
-      {/* TOMBOL DOWNLOAD (Hanya muncul di layar, tidak ikut ter-print) */}
-      <div className="flex justify-end">
+      {/* HEADER CONTROLS (Tombol Download) */}
+      <div className="flex justify-between items-center px-2">
+        <div className="text-sm text-slate-400 font-mono flex items-center gap-2">
+          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+          ANALYSIS_COMPLETE
+        </div>
         <button
           onClick={handleDownloadPDF}
           disabled={isDownloading}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-emerald-900/20"
+          className="group flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/50 px-5 py-2.5 rounded-lg font-medium transition-all duration-300 backdrop-blur-sm"
         >
           {isDownloading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Sedang Mencetak...
-            </>
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <>
-              <Download className="w-4 h-4" />
-              Download Laporan PDF Resmi
-            </>
+            <Download className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
           )}
+          <span>Download PDF Resmi</span>
         </button>
       </div>
 
-      {/* AREA YANG AKAN DI-PRINT (Ref) */}
-      <div 
-        ref={contentRef} 
-        className="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden ring-1 ring-white/10"
-      >
+      {/* AREA UTAMA (Efek Kaca & Border Bercahaya) */}
+      <div className="relative group">
+        {/* Glow Effect di belakang kotak */}
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
         
-        {/* HEADER LAPORAN */}
-        <div className="bg-slate-950 p-8 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-bold text-white flex items-center gap-3">
-              <div className="bg-emerald-500/20 p-2 rounded-lg">
-                <ShieldCheck className="w-8 h-8 text-emerald-400" />
-              </div>
-              AUDIT RISIKO KONTRAK
-            </h2>
-            <div className="flex items-center gap-2 mt-2 ml-1">
-              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
-              <p className="text-slate-400 text-xs font-mono tracking-widest uppercase opacity-80">
-                POWERED BY ADVANCED NEURAL LOGIC
-              </p>
+        <div 
+          ref={contentRef} 
+          className="relative bg-slate-950 rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-2xl"
+        >
+          
+          {/* HEADER LAPORAN DENGAN PATTERN */}
+          <div className="relative bg-slate-900 p-8 border-b border-white/5 overflow-hidden">
+             {/* Hiasan Background Header */}
+             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                <ShieldCheck className="w-64 h-64 text-white" />
+             </div>
+             
+             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+                      AUDIT RISIKO KONTRAK
+                    </span>
+                  </h2>
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400 tracking-wider">
+                      CONFIDENTIAL
+                    </div>
+                    <p className="text-slate-400 text-xs font-mono tracking-widest uppercase opacity-80">
+                      POWERED BY ADVANCED NEURAL LOGIC
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="text-right hidden sm:block font-mono text-xs text-slate-500">
+                   <p className="mb-1">DIGITAL SIGNATURE</p>
+                   <p className="text-emerald-500 bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/10 inline-block">
+                     {new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase()}
+                   </p>
+                </div>
+             </div>
+          </div>
+          
+          {/* ISI KONTEN */}
+          <div className="p-8 sm:p-10 min-h-[500px] bg-slate-950 relative">
+            {/* Grid Pattern Halus di dalam kertas */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"></div>
+
+            <div className="relative z-10">
+              <ReactMarkdown
+                components={{
+                  h1: ({node, ...props}) => (
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-8 pb-4 border-b border-slate-800 flex items-center gap-3" {...props} />
+                  ),
+                  h2: ({node, ...props}) => (
+                    <div className="mt-10 mb-6 group">
+                      <h2 className="text-xl font-bold text-emerald-400 flex items-center gap-3 bg-emerald-950/30 p-3 rounded-lg border-l-4 border-emerald-500 group-hover:bg-emerald-950/50 transition-colors" {...props} />
+                    </div>
+                  ),
+                  h3: ({node, ...props}) => (
+                    <h3 className="text-lg font-semibold text-slate-200 mt-6 mb-3 ml-1 border-l-2 border-slate-700 pl-3" {...props} />
+                  ),
+                  ul: ({node, ...props}) => (
+                    <ul className="space-y-3 text-slate-300 mb-6" {...props} />
+                  ),
+                  li: ({node, ...props}) => (
+                    <li className="flex items-start gap-3 leading-relaxed group" {...props}>
+                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-emerald-500 transition-colors flex-shrink-0"></span>
+                       <span>{props.children}</span>
+                    </li>
+                  ),
+                  strong: ({node, ...props}) => (
+                    <strong className="font-semibold text-rose-400 bg-rose-500/10 px-1 py-0.5 rounded mx-0.5 border border-rose-500/20" {...props} />
+                  ),
+                  p: ({node, ...props}) => (
+                    <p className="text-slate-300 leading-relaxed mb-5 text-justify" {...props} />
+                  ),
+                  blockquote: ({node, ...props}) => (
+                    <div className="my-6 p-4 rounded-r-lg border-l-4 border-amber-500/50 bg-amber-500/5 text-amber-200/80 italic text-sm">
+                      {props.children}
+                    </div>
+                  )
+                }}
+              >
+                {result}
+              </ReactMarkdown>
             </div>
           </div>
-          <div className="text-right hidden sm:block">
-            <p className="text-slate-500 text-xs">DIGITAL SIGNATURE</p>
-            <p className="text-emerald-500 font-mono text-xs mt-1">
-              {new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
-          </div>
-        </div>
-        
-        {/* ISI KONTEN */}
-        <div className="p-8 min-h-[500px]">
-          <ReactMarkdown
-            components={{
-              h1: ({node, ...props}) => (
-                <h1 className="text-3xl font-extrabold text-white mb-6 pb-4 border-b border-slate-700" {...props} />
-              ),
-              h2: ({node, ...props}) => (
-                <h2 className="text-xl font-bold text-emerald-400 mt-8 mb-4 flex items-center gap-2 bg-emerald-900/20 p-2 rounded-lg border-l-4 border-emerald-500" {...props} />
-              ),
-              h3: ({node, ...props}) => (
-                <h3 className="text-lg font-semibold text-slate-200 mt-6 mb-2 ml-1" {...props} />
-              ),
-              ul: ({node, ...props}) => (
-                <ul className="list-disc pl-5 space-y-3 text-slate-300 mb-6 marker:text-emerald-500" {...props} />
-              ),
-              li: ({node, ...props}) => (
-                <li className="leading-relaxed pl-2" {...props} />
-              ),
-              strong: ({node, ...props}) => (
-                <strong className="font-bold text-rose-400 bg-rose-400/10 px-1 rounded mx-1" {...props} />
-              ),
-              p: ({node, ...props}) => (
-                <p className="text-slate-300 leading-relaxed mb-4 text-justify" {...props} />
-              ),
-              blockquote: ({node, ...props}) => (
-                <blockquote className="border-l-4 border-slate-600 pl-4 italic text-slate-400 my-4 bg-slate-950/50 p-4 rounded-r-lg" {...props} />
-              )
-            }}
-          >
-            {result}
-          </ReactMarkdown>
-        </div>
 
-        {/* FOOTER PDF */}
-        <div className="bg-slate-950 p-6 border-t border-slate-800">
-           <div className="flex items-start gap-3 max-w-3xl mx-auto text-xs text-slate-500 text-justify">
-              <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-              <p>
-                <strong>DISCLAIMER HUKUM:</strong> Laporan ini dihasilkan secara otomatis oleh sistem kecerdasan buatan (AI) LegalShield. 
-                Hasil analisis ini bertujuan sebagai referensi mitigasi risiko awal dan tidak memiliki kekuatan hukum mengikat layaknya pendapat hukum (Legal Opinion) yang dikeluarkan oleh Advokat berlisensi. 
-                Pengguna disarankan untuk memverifikasi temuan ini dengan konsultan hukum profesional sebelum mengambil keputusan hukum strategis.
-              </p>
-           </div>
-           <div className="text-center mt-4 pt-4 border-t border-slate-900 text-slate-600 font-mono text-[10px]">
-              DOCUMENT ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} • SECURE GENERATION • LEGALSHIELD AI
-           </div>
+          {/* FOOTER PDF */}
+          <div className="bg-slate-900/50 p-6 border-t border-white/5 backdrop-blur-sm">
+             <div className="flex items-start gap-3 max-w-3xl mx-auto text-xs text-slate-500 text-justify bg-slate-800/50 p-4 rounded-lg border border-white/5">
+                <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                <p>
+                  <strong>DISCLAIMER SISTEM:</strong> Laporan ini dihasilkan secara otomatis oleh Neural Engine AI. 
+                  Hasil analisis ini bertujuan sebagai referensi mitigasi risiko awal dan tidak memiliki kekuatan hukum mengikat.
+                  Pengguna wajib memverifikasi temuan ini dengan konsultan hukum profesional.
+                </p>
+             </div>
+             <div className="text-center mt-6 text-slate-700 font-mono text-[10px] tracking-widest uppercase">
+                SECURE REPORT ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} • LEGALSHIELD AI
+             </div>
+          </div>
         </div>
       </div>
     </div>
