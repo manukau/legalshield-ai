@@ -11,20 +11,19 @@ const useTypewriter = (text: string, speed: number = 50, startDelay: number = 50
   const [displayText, setDisplayText] = useState('');
   
   useEffect(() => {
-    // Reset saat text berubah
-    setDisplayText('');
+    let i = 0;
+    setDisplayText(''); // Reset awal
     
-    // Timer untuk mulai mengetik (delay awal)
     const startTimeout = setTimeout(() => {
-      let i = 0;
       const timer = setInterval(() => {
-        if (i < text.length) {
-          setDisplayText((prev) => prev + text.charAt(i));
-          i++;
-        } else {
+        i++;
+        // Teknik slice ini lebih aman daripada prev + char
+        setDisplayText(text.slice(0, i)); 
+        
+        if (i >= text.length) {
           clearInterval(timer);
         }
-      }, speed); // Kecepatan ketik (ms)
+      }, speed);
 
       return () => clearInterval(timer);
     }, startDelay);
@@ -194,5 +193,6 @@ const App: React.FC = () => {
 };
 
 export default App;
+
 
 
