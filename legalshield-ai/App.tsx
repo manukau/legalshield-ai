@@ -1,16 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileUploader } from './components/FileUploader';
 import { ResultDisplay } from './components/ResultDisplay';
 import { analyzeContract } from './services/geminiService';
 import { AnalysisStatus } from './types';
-// PERBAIKAN 1: Menambahkan AlertTriangle di sini
 import { Scale, Loader2, CheckCircle2, ShieldCheck, AlertTriangle } from 'lucide-react';
+
+// --- BAGIAN 1: KITA BIKIN MESIN TIKNYA DI SINI ---
+// Custom Hook untuk efek mengetik
+const useTypewriter = (text: string, speed: number = 50, startDelay: number = 500) => {
+  const [displayText, setDisplayText] = useState('');
+  
+  useEffect(() => {
+    // Reset saat text berubah
+    setDisplayText('');
+    
+    // Timer untuk mulai mengetik (delay awal)
+    const startTimeout = setTimeout(() => {
+      let i = 0;
+      const timer = setInterval(() => {
+        if (i < text.length) {
+          setDisplayText((prev) => prev + text.charAt(i));
+          i++;
+        } else {
+          clearInterval(timer);
+        }
+      }, speed); // Kecepatan ketik (ms)
+
+      return () => clearInterval(timer);
+    }, startDelay);
+
+    return () => clearTimeout(startTimeout);
+  }, [text, speed, startDelay]);
+
+  return displayText;
+};
 
 const App: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<AnalysisStatus>(AnalysisStatus.IDLE);
   const [result, setResult] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+
+  // --- BAGIAN 2: KITA GUNAKAN MESIN TIKNYA ---
+  // Teks ini yang akan muncul satu per satu
+  const typedText = useTypewriter("Dalam Hitungan Detik...", 70, 1000);
 
   const handleAnalyze = async () => {
     if (!file) return;
@@ -55,12 +88,18 @@ const App: React.FC = () => {
         
         {/* Hero Section */}
         <div className="text-center mb-12">
-         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-    Analisa Risiko Kontrak <br />
-    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-      Dalam Hitungan Detik
-    </span>
-  </h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight min-h-[120px] sm:min-h-[auto]">
+            Analisa Risiko Kontrak <br />
+            
+            {/* --- BAGIAN 3: EFEK VISUALNYA --- */}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+              {typedText}
+            </span>
+            
+            {/* CURSOR KEDAP-KEDIP */}
+            <span className="inline-block w-1 h-8 md:h-12 ml-1 align-middle bg-emerald-400 animate-pulse"></span>
+          </h1>
+
           <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Upload draft kontrak sewa atau kerjasama Anda. AI kami akan mencari pasal berbahaya 
             (<span className="text-red-400 font-semibold">Red Flags</span>) dan potensi biaya tersembunyi sebelum Anda tanda tangan.
@@ -118,7 +157,6 @@ const App: React.FC = () => {
             <div className="mb-8 w-full max-w-xl bg-red-900/20 border border-red-500/50 p-4 rounded-lg backdrop-blur-sm">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  {/* Icon AlertTriangle sekarang sudah aman dipanggil */}
                   <AlertTriangle className="h-5 w-5 text-red-400" />
                 </div>
                 <div className="ml-3">
@@ -133,7 +171,6 @@ const App: React.FC = () => {
           {/* Step 3: Result */}
           {status === AnalysisStatus.COMPLETE && result && (
             <div className="w-full animate-fade-in-up">
-              {/* PERBAIKAN 2: Menghapus 'isLoading={false}' agar cocok dengan komponenmu */}
               <ResultDisplay result={result} /> 
               
               <div className="text-center mt-12 border-t border-slate-800 pt-8">
@@ -157,4 +194,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
