@@ -43,7 +43,7 @@ const App: React.FC = () => {
 
   // --- BAGIAN 2: KITA GUNAKAN MESIN TIKNYA ---
   // Teks ini yang akan muncul satu per satu
-  const typedText = useTypewriter("Dalam Hitungan Detik...", 70, 1000);
+  const typedText = useTypewriter("Dalam Hitungan Detik", 70, 1000);
 
   const handleAnalyze = async () => {
     if (!file) return;
@@ -194,3 +194,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
