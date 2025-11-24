@@ -52,13 +52,13 @@ const App: React.FC = () => {
     // 1. BACKGROUND DENGAN EFEK GRID MATRIX (SILICON VALLEY VIBE)
     <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-emerald-500/30 font-sans relative overflow-hidden">
       
-      {/* Background Grid Pattern (Garis-garis tipis) */}
+      {/* Background Grid Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
       
-      {/* Aurora Glow (Cahaya Hijau di tengah atas) */}
+      {/* Aurora Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-emerald-500/20 rounded-full blur-[120px] -z-10"></div>
 
-      {/* Navbar Glassmorphism (Kaca Buram) */}
+      {/* Navbar Glassmorphism */}
       <nav className="border-b border-white/5 sticky top-0 z-50 backdrop-blur-xl bg-slate-950/70">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -83,11 +83,9 @@ const App: React.FC = () => {
         
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/50 border border-slate-800 text-slate-400 text-sm mb-8 hover:border-emerald-500/50 transition-colors cursor-default">
-            <span className="text-emerald-400">✨ New Engine:</span> Gemini 2.5 Flash Integrated
-          </div>
+          {/* BAGIAN "NEW ENGINE" SUDAH DIHAPUS DARI SINI */}
 
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-8 tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-8 tracking-tight leading-tight min-h-[120px] sm:min-h-[auto]">
             Analisa Risiko Kontrak <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 bg-300% animate-gradient">
               {typedText}
