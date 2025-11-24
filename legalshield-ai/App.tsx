@@ -49,7 +49,7 @@ const App: React.FC = () => {
   };
 
   return (
-    // 1. BACKGROUND DENGAN EFEK GRID MATRIX (SILICON VALLEY VIBE)
+    // 1. BACKGROUND DENGAN EFEK GRID MATRIX
     <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-emerald-500/30 font-sans relative overflow-hidden">
       
       {/* Background Grid Pattern */}
@@ -82,9 +82,7 @@ const App: React.FC = () => {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          {/* BAGIAN "NEW ENGINE" SUDAH DIHAPUS DARI SINI */}
-
+        <div className="text-center mb-12">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-8 tracking-tight leading-tight min-h-[120px] sm:min-h-[auto]">
             Analisa Risiko Kontrak <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 bg-300% animate-gradient">
@@ -99,27 +97,12 @@ const App: React.FC = () => {
           </p>
         </div>
 
-        {/* 3 FITUR UNGGULAN (BENTO GRID STYLE) */}
-        {!file && !result && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 px-4">
-            {[
-              { icon: Zap, title: "Analisa Kilat", desc: "Scan 50 halaman dalam <10 detik" },
-              { icon: BrainCircuit, title: "Neural Logic", desc: "Paham konteks hukum Indonesia" },
-              { icon: Lock, title: "Zero Retention", desc: "Dokumen tidak disimpan di server" }
-            ].map((feature, idx) => (
-              <div key={idx} className="p-6 rounded-2xl bg-slate-900/50 border border-white/5 hover:border-emerald-500/30 transition-all hover:bg-slate-900/80 group">
-                <feature.icon className="w-8 h-8 text-slate-500 group-hover:text-emerald-400 mb-4 transition-colors" />
-                <h3 className="text-white font-bold mb-2">{feature.title}</h3>
-                <p className="text-sm text-slate-500">{feature.desc}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Flow Utama */}
+        {/* --- FLOW UTAMA --- */}
         <div className="flex flex-col items-center w-full">
-          <div className="w-full max-w-xl relative group">
-             {/* Efek Glow di belakang uploader saat hover */}
+          
+          {/* 1. FILE UPLOADER (POSISI PALING ATAS) */}
+          <div className="w-full max-w-xl relative group z-20">
+             {/* Efek Glow di belakang uploader */}
              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
              <div className="relative bg-slate-950 rounded-xl">
                 <FileUploader 
@@ -130,6 +113,32 @@ const App: React.FC = () => {
              </div>
           </div>
 
+          {/* 2. BENTO GRID (DIPINDAHKAN KE BAWAH UPLOADER) */}
+          {/* Logic: Hanya muncul jika belum ada file yang dipilih (sebagai filler space) */}
+          {!file && !result && (
+            <div className="w-full mt-16 animate-fade-in-up">
+              <p className="text-center text-slate-500 text-sm mb-6 uppercase tracking-widest font-mono">
+                WHY CHOOSE LEGALSHIELD AI
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  { icon: Zap, title: "Analisa Kilat", desc: "Scan 50 halaman dalam <10 detik" },
+                  { icon: BrainCircuit, title: "Neural Logic", desc: "Paham konteks hukum Indonesia" },
+                  { icon: Lock, title: "Zero Retention", desc: "Dokumen tidak disimpan di server" }
+                ].map((feature, idx) => (
+                  <div key={idx} className="p-6 rounded-2xl bg-slate-900/50 border border-white/5 hover:border-emerald-500/30 transition-all hover:bg-slate-900/80 group text-center md:text-left">
+                    <div className="inline-block p-3 rounded-lg bg-slate-800 group-hover:bg-emerald-500/10 mb-4 transition-colors">
+                       <feature.icon className="w-6 h-6 text-slate-400 group-hover:text-emerald-400" />
+                    </div>
+                    <h3 className="text-white font-bold mb-2">{feature.title}</h3>
+                    <p className="text-sm text-slate-500">{feature.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 3. TOMBOL ACTION (MUNCUL SETELAH FILE DIPILIH) */}
           {file && status !== AnalysisStatus.COMPLETE && (
             <div className="mb-12 mt-8 animate-fade-in-up">
               <button
@@ -158,15 +167,17 @@ const App: React.FC = () => {
             </div>
           )}
 
+          {/* 4. ERROR MESSAGE */}
           {status === AnalysisStatus.ERROR && (
-            <div className="mb-8 w-full max-w-xl bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-center gap-3 text-red-200">
+            <div className="mb-8 w-full max-w-xl bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-center gap-3 text-red-200 mt-8">
               <AlertTriangle className="h-5 w-5 flex-shrink-0" />
               <p className="text-sm">{error}</p>
             </div>
           )}
 
+          {/* 5. HASIL ANALISA */}
           {status === AnalysisStatus.COMPLETE && result && (
-            <div className="w-full animate-fade-in-up">
+            <div className="w-full mt-12 animate-fade-in-up">
               <ResultDisplay result={result} /> 
               <div className="text-center mt-12 border-t border-slate-800/50 pt-8">
                 <button
