@@ -1,19 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// 1. SETUP API KEY (Menggunakan standar Vite)
 // @ts-ignore
 const apiKey = import.meta.env.VITE_API_KEY;
-
-// Inisialisasi Google AI
 const genAI = new GoogleGenerativeAI(apiKey);
 
-// 2. FUNGSI PEMBANTU: Mengubah File PDF jadi data yang bisa dibaca AI
 async function fileToGenerativePart(file: File) {
   return new Promise<any>((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const result = reader.result as string;
-      // Ambil bagian base64-nya saja (setelah tanda koma)
       const base64String = result.split(',')[1];
       resolve({
         inlineData: { data: base64String, mimeType: file.type },
@@ -24,60 +19,54 @@ async function fileToGenerativePart(file: File) {
   });
 }
 
-// 3. FUNGSI UTAMA: Menganalisa Kontrak
 export const analyzeContract = async (file: File) => {
-  // Cek Darurat: Apakah API Key ada?
   if (!apiKey || apiKey.length < 10) {
-    throw new Error(
-      "API Key hilang/rusak. Cek Vercel Environment Variables pastikan namanya VITE_API_KEY"
-    );
+    throw new Error("API Key Error. Cek Vercel Environment Variables.");
   }
 
   try {
-    // Gunakan model terbaru (Gemini 2.5 Flash)
-    // Pastikan nama model sesuai dengan yang tersedia di akunmu
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
-      // SYSTEM INSTRUCTION (INSTRUKSI BARU YANG AMAN)
+      // --- PERBAIKAN FATAL DI SINI (SYSTEM INSTRUCTION BARU) ---
       systemInstruction: `
       PERAN:
-      Anda adalah Sistem AI Audit Risiko Kontrak (Contract Risk Engine).
-      Tugas Anda adalah memindai dokumen secara objektif.
+      Anda adalah Sistem Audit Risiko Legal Otomatis (AI Legal Auditor) yang berfokus pada Yurisdiksi HUKUM INDONESIA.
+      
+      KONTEKS HUKUM:
+      Gunakan dasar hukum:
+      1. KUHPerdata (Kitab Undang-Undang Hukum Perdata) Indonesia.
+      2. UU Cipta Kerja (jika relevan dengan ketenagakerjaan).
+      3. UU ITE (jika relevan dengan transaksi elektronik).
+      
+      TUGAS UTAMA:
+      Analisis dokumen untuk mencari ketidakseimbangan hak dan kewajiban yang merugikan salah satu pihak.
 
-      ATURAN PENTING (SAFETY):
-      1. JANGAN PERNAH mengaku sebagai "Pengacara", "Lawyer", atau Manusia.
-      2. Gunakan sudut pandang sistem (Contoh: "Sistem mendeteksi...", "Analisis menunjukkan...").
-      3. Jangan gunakan kalimat "Saran saya...", ganti dengan "Rekomendasi perbaikan...".
-      4. Gunakan Bahasa Indonesia yang lugas dan profesional.
+      ATURAN OUTPUT (STRICT):
+      1. JANGAN BERIKAN SKOR ANGKA (1-10). Itu menyesatkan.
+      2. GANTI DENGAN "TINGKAT RISIKO": [RENDAH / SEDANG / TINGGI / KRITIS].
+      3. JANGAN MENGAKU SEBAGAI PENGACARA. Gunakan kalimat "Sistem mendeteksi...", "Potensi risiko...".
+      4. JANGAN GUNAKAN HUKUM AMERIKA (Common Law). Gunakan istilah hukum Indonesia (Wanprestasi, Force Majeure, Domisili Hukum).
 
-      FORMAT OUTPUT:
-      Berikan laporan audit tegas:
-      1. 🛡️ SKOR KEAMANAN (1-10)
-      2. 🚩 RED FLAGS (Pasal Berbahaya & Alasannya)
-      3. 💰 POTENSI BIAYA TERSEMBUNYI
-      4. ⚖️ KESIMPULAN & REKOMENDASI TEKNIS
+      FORMAT LAPORAN:
+      1. 🚦 TINGKAT RISIKO: [RENDAH/SEDANG/TINGGI]
+      2. 📋 RINGKASAN EKSEKUTIF (Bahasa awam)
+      3. 🚩 RED FLAGS & PASAL BERMASALAH (Kutip pasalnya, lalu jelaskan bahayanya menurut KUHPerdata/Kebiasaan Bisnis di Indonesia)
+      4. ⚖️ REKOMENDASI PERBAIKAN PASAL (Saran redaksional yang lebih adil)
       `
     });
 
-    // Proses file PDF
     const filePart = await fileToGenerativePart(file);
-
-    // Kirim perintah
-    const prompt = "Lakukan audit risiko lengkap pada dokumen yang dilampirkan ini sesuai instruksi sistem.";
+    
+    // Prompt yang diperjelas
+    const prompt = "Lakukan audit legal menyeluruh pada dokumen ini berdasarkan hukum Indonesia.";
     
     const result = await model.generateContent([prompt, filePart]);
     const response = await result.response;
-    
     return response.text();
 
   } catch (error: any) {
     console.error("Gemini Error:", error);
-    
-    // Penanganan Error yang Ramah
-    if (error.message?.includes("404") || error.message?.includes("not found")) {
-      throw new Error("Model AI sedang sibuk atau versi model tidak ditemukan. Coba refresh.");
-    }
-    
-    throw new Error("Gagal menganalisa. Pastikan file PDF tidak dikunci password.");
+    if (error.message?.includes("404")) throw new Error("Model AI sedang sibuk. Coba lagi.");
+    throw new Error("Gagal menganalisa. Pastikan file PDF bisa dibaca.");
   }
 };
