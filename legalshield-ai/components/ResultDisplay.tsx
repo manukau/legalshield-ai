@@ -55,7 +55,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
   return (
     <div className="space-y-6 animate-fade-in-up">
       
-      {/* HEADER CONTROLS (Tombol Download) */}
+      {/* HEADER CONTROLS */}
       <div className="flex justify-between items-center px-2">
         <div className="text-sm text-slate-400 font-mono flex items-center gap-2">
           <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
@@ -73,17 +73,12 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
           ) : (
             <Download className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
           )}
-          
-          {/* --- BAGIAN INI YANG MENGATUR TEXT RESPONSIVE --- */}
-          {/* 1. Tampil di HP saja (Layar Kecil) */}
           <span className="sm:hidden">Download</span>
-          
-          {/* 2. Tampil di Laptop/Tablet (Layar Besar) */}
           <span className="hidden sm:inline">Download PDF Resmi</span>
         </button>
       </div>
 
-      {/* AREA UTAMA (Efek Kaca & Border Bercahaya) */}
+      {/* AREA UTAMA */}
       <div className="relative group">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
         
@@ -175,13 +170,16 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
             </div>
           </div>
 
-          {/* FOOTER PDF */}
+          {/* FOOTER PDF DENGAN DISCLAIMER YANG DIPERKUAT */}
           <div className="bg-slate-900/50 p-6 border-t border-white/5 backdrop-blur-sm">
              <div className="flex items-start gap-3 max-w-3xl mx-auto text-xs text-slate-500 text-justify bg-slate-800/50 p-4 rounded-lg border border-white/5">
                 <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
                 <p>
-                  <strong>DISCLAIMER SISTEM:</strong> Laporan ini dihasilkan otomatis oleh Neural Engine AI. 
-                  Hasil tidak mengikat secara hukum. Verifikasi dengan ahli profesional.
+                  <strong>DISCLAIMER & PENYANGKALAN TANGGUNG JAWAB:</strong><br/> 
+                  Analisis ini dihasilkan oleh kecerdasan buatan (AI) sebagai referensi awal berdasarkan konteks hukum umum di Indonesia (KUHPerdata/UU terkait). 
+                  Hasil ini <u>BUKAN</u> pengganti nasihat hukum profesional. 
+                  Pengembang aplikasi tidak bertanggung jawab atas kesalahan interpretasi AI, ketidakakuratan data, atau kerugian yang timbul akibat penggunaan informasi ini. 
+                  Pengguna wajib memverifikasi temuan ini dengan Advokat/Konsultan Hukum berlisensi sebelum mengambil keputusan.
                 </p>
              </div>
              <div className="text-center mt-6 text-slate-700 font-mono text-[10px] tracking-widest uppercase">
