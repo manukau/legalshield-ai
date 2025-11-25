@@ -141,7 +141,7 @@ const App: React.FC = () => {
               <ShieldCheck className="text-emerald-400 w-6 h-6" />
             </div>
             <span className="text-xl font-bold text-white tracking-tight">
-              KontrakAman <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">AI</span>
+              VERIF <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">AI</span>
             </span>
           </div>
           <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-emerald-500/80 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
@@ -297,7 +297,7 @@ const App: React.FC = () => {
       <footer className="border-t border-white/5 bg-slate-950 py-8 mt-12 relative z-10">
         <div className="max-w-5xl mx-auto px-4 text-center">
             <p className="text-slate-600 text-xs">
-              &copy; 2025 KontrakAman AI. <span className="mx-2">•</span> Secure & Private.
+              &copy; 2025 VERIFAI. <span className="mx-2">•</span> Secure & Private.
             </p>
         </div>
       </footer>
@@ -306,5 +306,6 @@ const App: React.FC = () => {
 };
 
 export default App;
+
 
 
