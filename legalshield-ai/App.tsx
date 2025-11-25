@@ -13,7 +13,7 @@ const FEATURES = [
     title: "Analisa Kilat",
     subtitle: "Speed-first Architecture",
     desc: "Scan dokumen 50 halaman dalam < 10 detik.",
-    longDesc: "Menggunakan arsitektur pemrosesan paralel Gemini 2.5 Flash. Sistem memecah dokumen menjadi token vektor, menganalisanya secara simultan, dan menyusun kembali menjadi laporan hukum dalam hitungan milidetik. Tidak ada antrian, tidak ada loading lama.",
+    longDesc: "Menggunakan arsitektur pemrosesan paralel Gemini versi terakhir. Sistem memecah dokumen menjadi token vektor, menganalisanya secara simultan, dan menyusun kembali menjadi laporan hukum dalam hitungan milidetik. Tidak ada antrian, tidak ada loading lama.",
     gradient: "from-amber-400 to-orange-500"
   },
   {
@@ -223,7 +223,7 @@ const App: React.FC = () => {
 
                       {/* 'Learn More' Link */}
                       <div className="flex items-center gap-1 text-xs font-medium text-emerald-500 opacity-0 transform translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                        Lihat Detail Teknis <ChevronRight className="w-3 h-3" />
+                        Lihat Detail <ChevronRight className="w-3 h-3" />
                       </div>
                     </div>
                   </div>
@@ -302,3 +302,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
