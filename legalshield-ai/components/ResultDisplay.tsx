@@ -43,7 +43,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
         heightLeft -= pageHeight;
       }
 
-      pdf.save('LegalShield-Audit-Report.pdf');
+      pdf.save('VERIFAI-Audit-Report.pdf');
     } catch (error) {
       console.error("Gagal download PDF:", error);
       alert("Maaf, gagal membuat PDF.");
@@ -97,7 +97,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                      AUDIT RISIKO KONTRAK
+                      VERIFAI AUDIT REPORT
                     </span>
                   </h2>
                   <div className="flex items-center gap-2 mt-3">
@@ -107,7 +107,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
                     <div className="flex items-center gap-2 ml-1">
                       <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
                       <p className="text-slate-400 text-xs font-mono tracking-widest uppercase opacity-80 hidden sm:block">
-                        POWERED BY ADVANCED NEURAL LOGIC
+                        POWERED BY VERIFAI ENGINE
                       </p>
                       <p className="text-slate-400 text-xs font-mono tracking-widest uppercase opacity-80 sm:hidden">
                         NEURAL AI
@@ -183,7 +183,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
                 </p>
              </div>
              <div className="text-center mt-6 text-slate-700 font-mono text-[10px] tracking-widest uppercase">
-                ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} • LEGALSHIELD AI
+                ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} • VERIFAI
              </div>
           </div>
         </div>
@@ -191,3 +191,4 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
     </div>
   );
 };
+
