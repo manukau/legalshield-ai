@@ -187,14 +187,18 @@ const App: React.FC = () => {
              </div>
           </div>
 
-          {/* 2. FITUR CARDS (LINEAR STYLE) - Di Bawah Upload */}
-          {!file && !result && (
-            <div className="w-full mt-24 animate-fade-in-up">
-              <div className="flex items-center justify-between mb-8 px-2">
-                <p className="text-slate-500 text-sm uppercase tracking-widest font-mono">
-                  BUILT FOR MODERN BUSINESS
-                </p>
-              </div>
+          {/* 2. FITUR CARDS (LINEAR STYLE) */}
+{!file && !result && (
+  <div className="w-full mt-24 animate-fade-in-up">
+    
+    {/* --- GANTI BAGIAN DI BAWAH INI --- */}
+    <div className="flex items-center gap-4 mb-8 px-2">
+      <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-slate-700 flex-1 opacity-50"></div>
+      <p className="text-slate-400 text-xs md:text-sm font-bold uppercase tracking-[0.2em] font-mono whitespace-nowrap">
+         <span className="text-emerald-500">///</span> BUILT FOR MODERN BUSINESS
+      </p>
+      <div className="h-px bg-gradient-to-r from-slate-700 via-slate-700 to-transparent flex-1 opacity-50"></div>
+    </div>
 
               {/* GRID CARD LINEAR STYLE */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -302,4 +306,5 @@ const App: React.FC = () => {
 };
 
 export default App;
+
 
