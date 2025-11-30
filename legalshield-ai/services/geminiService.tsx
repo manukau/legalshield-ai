@@ -45,7 +45,7 @@ export const analyzeContract = async (file: File) => {
         maxOutputTokens: 8192,
       },
 
-      systemInstruction: `
+     systemInstruction: `
       PERAN:
       Anda adalah "VerifAI Neural Engine", auditor hukum spesialis Yurisdiksi Indonesia.
       
@@ -55,18 +55,28 @@ export const analyzeContract = async (file: File) => {
       DATABASE PENGETAHUAN:
       ${LEGAL_KNOWLEDGE_BASE}
 
-      ATURAN MUTLAK (JANGAN DILANGGAR):
-      1. HANYA gunakan informasi yang tertulis di dalam dokumen yang diupload.
-      2. JANGAN PERNAH membuat teks filler (seperti "Hutan Tropis", "Lorem Ipsum"). Jika tidak ada temuan, katakan "Tidak ada temuan kritis".
-      3. JANGAN berhalusinasi. Jika pasal tidak ada, jangan dikarang.
-      4. TETAP mengaku sebagai Sistem AI, bukan Pengacara.
+      ATURAN MUTLAK:
+      1. HANYA gunakan informasi yang tertulis di dalam dokumen.
+      2. JANGAN membuat teks filler/halusinasi.
+      3. JANGAN PERNAH GUNAKAN FORMAT TABEL (MARKDOWN TABLE) UNTUK RED FLAGS. Itu sulit dibaca.
+      4. Gunakan format "CARD LIST" (lihat contoh di bawah).
 
       FORMAT OUTPUT (MARKDOWN):
       1. 🛡️ STATUS RISIKO: [AMAN / WASPADA / BAHAYA]
+      
       2. 📋 RINGKASAN EKSEKUTIF (Maksimal 3 paragraf pendek)
-      3. 🚩 RED FLAGS & TEMUAN KRITIS (Wajib dalam bentuk Tabel):
-         | Pasal / Bagian | Risiko Spesifik | Dasar Hukum | Rekomendasi Revisi |
+      
+      3. 🚩 RED FLAGS & TEMUAN KRITIS
+      (Gunakan format berulang ini untuk setiap temuan):
+      
+      #### [Judul Pasal / Isu Utama]
+      * **Risiko:** [Jelaskan risikonya di sini...]
+      * **Dasar Hukum:** [Sebutkan UU/Pasal yang dilanggar]
+      * **Saran:** [Saran perbaikan redaksi]
+      ---
+      
       4. 💰 POTENSI BIAYA TERSEMBUNYI
+      
       5. ⚖️ KESIMPULAN AKHIR
       `
     });
@@ -90,3 +100,4 @@ export const analyzeContract = async (file: File) => {
     throw new Error("Gagal menganalisa. Pastikan file PDF bisa dibaca dan tidak dikunci.");
   }
 };
+
