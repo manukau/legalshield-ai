@@ -33,11 +33,11 @@ export const analyzeContract = async (file: File) => {
   }
 
   try {
-    // --- MENGGUNAKAN GEMINI 1.5 PRO (RAJA KECERDASAN STABIL) ---
+    // --- KEMBALI KE GEMINI 2.5 FLASH ---
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-pro", // Versi PRO yang pasti jalan & pintar
+      model: "gemini-2.5-flash", // Sesuai permintaanmu
       
-      // SAFETY: OFF (Agar berani baca dokumen sanksi/denda)
+      // --- WAJIB: MATIKAN SENSOR AGAR TIDAK 'SILENT FAIL' ---
       safetySettings: [
         { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
         { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -46,7 +46,7 @@ export const analyzeContract = async (file: File) => {
       ],
       
       generationConfig: {
-        temperature: 0.0, // Kreativitas 0 (Fakta Keras)
+        temperature: 0.0, // Fokus fakta
         maxOutputTokens: 8192,
       },
       
@@ -91,16 +91,16 @@ export const analyzeContract = async (file: File) => {
     const response = await result.response;
     
     if (!response || !response.text()) {
-      throw new Error("Tidak ada respon dari AI. Coba lagi.");
+      throw new Error("Tidak ada respon dari AI. Kemungkinan dokumen terlalu kompleks atau sensor aktif.");
     }
 
     return response.text();
 
   } catch (error: any) {
     console.error("Gemini Error:", error);
-    // Error Handling yang Jujur
-    if (error.message?.includes("429")) {
-        throw new Error("Server AI sedang sibuk (Kuota Penuh). Tunggu 1-2 menit lalu coba lagi.");
+    // Fallback error message
+    if (error.message?.includes("404")) {
+        throw new Error("Model gemini-2.5-flash sedang tidak merespon. Coba ganti ke gemini-1.5-flash.");
     }
     throw new Error(error.message || "Gagal menganalisa dokumen.");
   }
