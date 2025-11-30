@@ -19,17 +19,17 @@ async function fileToGenerativePart(file: File) {
   });
 }
 
+// CONTEKAN HUKUM INDONESIA (VERSI C)
 const LEGAL_KNOWLEDGE_BASE = `
 DASAR HUKUM INDONESIA:
-1. KUHPerdata Pasal 1320 (Syarat Sah): Sepakat, Cakap, Hal Tertentu, Sebab Halal.
-2. KUHPerdata Pasal 1338 (Kebebasan Berkontrak) & 1266 (Pembatalan Lewat Pengadilan).
-3. UU Cipta Kerja (Ketenagakerjaan) & UU ITE.
-4. Asas Proporsionalitas & Itikad Baik.
+1. KUHPerdata Pasal 1320 (Syarat Sah Perjanjian): Sepakat, Cakap, Hal Tertentu, Sebab Halal.
+2. KUHPerdata Pasal 1338 (Asas Kebebasan Berkontrak): Perjanjian berlaku sebagai undang-undang bagi pembuatnya.
+3. KUHPerdata Pasal 1266 (Pembatalan Lewat Pengadilan): Sering dikesampingkan, perlu diperhatikan.
+4. UU Cipta Kerja (Ketenagakerjaan) & UU ITE (Transaksi Elektronik).
+5. Asas Proporsionalitas: Hak dan kewajiban para pihak harus seimbang.
 `;
 
-// PERUBAHAN BESAR DI SINI:
-// Fungsi ini sekarang adalah "Generator" (tanda *) yang mengirim data sepotong-sepotong
-export async function* analyzeContractStream(file: File) {
+export const analyzeContract = async (file: File) => {
   if (!apiKey || apiKey.length < 10) {
     throw new Error("API Key Error. Cek Vercel Environment Variables.");
   }
@@ -38,45 +38,57 @@ export async function* analyzeContractStream(file: File) {
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
       generationConfig: {
-        temperature: 0.1, // Sedikit kreativitas agar bahasa lebih luwes, tapi tetap fakta
-        maxOutputTokens: 8192, // Batas output maksimal
+        temperature: 0.0, // KREATIVITAS MATI (Hanya Fakta)
+        topP: 0.8,
+        topK: 40,
+        maxOutputTokens: 8192,
       },
       systemInstruction: `
-      PERAN: Anda adalah "VerifAI Neural Engine", auditor hukum spesialis Yurisdiksi Indonesia.
-      MISI: Audit dokumen ini. Temukan celah risiko.
+      PERAN:
+      Anda adalah "VerifAI Neural Engine", auditor hukum spesialis Yurisdiksi Indonesia.
       
-      DATABASE: ${LEGAL_KNOWLEDGE_BASE}
+      MISI:
+      Audit dokumen ini secara ketat. Temukan celah risiko hukum & finansial.
 
-      ATURAN:
-      1. Gunakan HANYA info di dokumen.
-      2. Jangan halusinasi.
-      3. Format CARD LIST untuk Red Flags (Jangan Tabel).
-      4. Bahasa tegas & profesional.
+      DATABASE PENGETAHUAN:
+      ${LEGAL_KNOWLEDGE_BASE}
+
+      ATURAN MUTLAK:
+      1. HANYA gunakan informasi yang ada di dokumen. JANGAN berhalusinasi.
+      2. JANGAN PERNAH GUNAKAN FORMAT TABEL.
+      3. Gunakan format "CARD LIST" (Daftar ke bawah) untuk Red Flags agar mudah dibaca.
+      4. TETAP mengaku sebagai Sistem AI, bukan Pengacara.
 
       FORMAT OUTPUT (MARKDOWN):
       1. 🛡️ STATUS RISIKO: [AMAN / WASPADA / BAHAYA]
-      2. 📋 RINGKASAN EKSEKUTIF
+      
+      2. 📋 RINGKASAN EKSEKUTIF (Singkat & Padat)
+      
       3. 🚩 RED FLAGS & TEMUAN KRITIS
-         (Format: #### [Judul] ... )
+      (Ulangi format ini untuk setiap temuan):
+      #### [Judul Pasal / Isu]
+      * **Risiko:** [Penjelasan risiko...]
+      * **Dasar Hukum:** [Pasal/UU yang relevan]
+      * **Saran:** [Rekomendasi perbaikan]
+      ---
+      
       4. 💰 POTENSI BIAYA TERSEMBUNYI
+      
       5. ⚖️ KESIMPULAN AKHIR
       `
     });
 
     const filePart = await fileToGenerativePart(file);
-    const prompt = "Lakukan audit deep-scan pada dokumen ini. Identifikasi risiko hukum & finansial.";
     
-    // MENGGUNAKAN STREAMING
-    const result = await model.generateContentStream([prompt, filePart]);
-
-    // Loop untuk menangkap setiap potongan teks (Chunk)
-    for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      yield chunkText; // Kirim potongan teks ke frontend
-    }
+    const prompt = "Lakukan audit deep-scan pada dokumen ini. Identifikasi risiko hukum & finansial secara mendetail.";
+    
+    const result = await model.generateContent([prompt, filePart]);
+    const response = await result.response;
+    return response.text();
 
   } catch (error: any) {
-    console.error("Gemini Stream Error:", error);
-    throw new Error("Koneksi terputus atau file tidak terbaca. Coba lagi.");
+    console.error("Gemini Error:", error);
+    if (error.message?.includes("404")) throw new Error("Model AI sedang sibuk. Coba lagi.");
+    throw new Error("Gagal menganalisa. Pastikan file PDF tidak rusak/terkunci.");
   }
-}
+};
