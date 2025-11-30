@@ -19,14 +19,12 @@ async function fileToGenerativePart(file: File) {
   });
 }
 
-// DATABASE HUKUM VERIFAI
 const LEGAL_KNOWLEDGE_BASE = `
 REFERENSI HUKUM INDONESIA:
-1. KUHPerdata Pasal 1320 (Syarat Sah Perjanjian).
-2. KUHPerdata Pasal 1338 (Asas Kebebasan Berkontrak) & Pasal 1266.
-3. UU Cipta Kerja (Terkait PKWT/Ketenagakerjaan).
-4. UU ITE (Informasi & Transaksi Elektronik).
-5. Asas Proporsionalitas & Itikad Baik dalam bisnis.
+1. KUHPerdata Pasal 1320 (Syarat Sah) & 1338 (Kebebasan Berkontrak).
+2. UU Cipta Kerja (Ketenagakerjaan).
+3. UU ITE (Transaksi Elektronik).
+4. Asas Proporsionalitas: Hak dan kewajiban harus seimbang.
 `;
 
 export const analyzeContract = async (file: File) => {
@@ -35,12 +33,11 @@ export const analyzeContract = async (file: File) => {
   }
 
   try {
-    // --- UPGRADE KE MESIN TERCANGGIH: GEMINI 3.0 PRO ---
-    // Menggunakan versi preview terbaru untuk kecerdasan maksimal
+    // --- MENGGUNAKAN GEMINI 1.5 PRO (RAJA KECERDASAN STABIL) ---
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-3-pro-preview", 
+      model: "gemini-1.5-pro", // Versi PRO yang pasti jalan & pintar
       
-      // --- MATIKAN SENSOR (SUPAYA TIDAK BISU SAAT BACA PASAL SANKSI) ---
+      // SAFETY: OFF (Agar berani baca dokumen sanksi/denda)
       safetySettings: [
         { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
         { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -49,29 +46,29 @@ export const analyzeContract = async (file: File) => {
       ],
       
       generationConfig: {
-        temperature: 0.1, // Kreativitas rendah agar analisisnya faktual
+        temperature: 0.0, // Kreativitas 0 (Fakta Keras)
         maxOutputTokens: 8192,
       },
       
       systemInstruction: `
       PERAN:
-      Anda adalah "VerifAI Neural Engine", konsultan hukum AI tercanggih dengan spesialisasi Hukum Bisnis Indonesia.
+      Anda adalah "VerifAI Neural Engine", auditor hukum spesialis Yurisdiksi Indonesia.
       
       MISI:
-      Lakukan audit forensik pada dokumen ini. Lindungi pengguna dari risiko hukum & finansial.
+      Audit dokumen ini. Temukan celah risiko hukum & finansial bagi pengguna.
 
       DATABASE: ${LEGAL_KNOWLEDGE_BASE}
 
-      ATURAN AUDIT:
-      1. KUTIP PASAL DOKUMEN: Setiap temuan harus merujuk ke teks asli (misal: "Pada Pasal 5 ayat 2...").
-      2. ANALISIS TAJAM: Gunakan logika hukum senior. Jangan hanya meringkas.
-      3. FORMAT RAPI: Gunakan "Card List" (bukan tabel).
-      4. IDENTITAS: Tetap sebagai Sistem AI.
+      ATURAN:
+      1. KUTIP PASAL ASLI DARI DOKUMEN saat menjelaskan risiko.
+      2. Gunakan Logika Hukum Indonesia.
+      3. Format "CARD LIST" (Daftar ke bawah) untuk Red Flags.
+      4. Bahasa tegas, profesional, dan to-the-point.
 
       FORMAT OUTPUT (MARKDOWN):
       1. 🛡️ STATUS RISIKO: [AMAN / WASPADA / BAHAYA]
       
-      2. 📋 RINGKASAN EKSEKUTIF (Executive Summary)
+      2. 📋 RINGKASAN EKSEKUTIF
       
       3. 🚩 RED FLAGS & TEMUAN KRITIS
       (Format Berulang):
@@ -88,22 +85,22 @@ export const analyzeContract = async (file: File) => {
     });
 
     const filePart = await fileToGenerativePart(file);
-    const prompt = "Lakukan Deep Legal Audit sekarang. Berikan analisis yang tajam dan kritikal.";
+    const prompt = "Lakukan Deep Legal Audit sekarang. Cari risiko yang merugikan pihak pengguna.";
     
     const result = await model.generateContent([prompt, filePart]);
     const response = await result.response;
     
     if (!response || !response.text()) {
-      throw new Error("Analisis terhenti oleh sistem keamanan. Coba dokumen lain.");
+      throw new Error("Tidak ada respon dari AI. Coba lagi.");
     }
 
     return response.text();
 
   } catch (error: any) {
     console.error("Gemini Error:", error);
-    // Fallback jika Gemini 3.0 belum aktif di akunmu, otomatis turun ke 2.5 Pro (Stable)
-    if (error.message?.includes("404") || error.message?.includes("not found")) {
-        throw new Error("Mesin Gemini 3.0 sedang sibuk/belum tersedia di region ini. Coba ganti kode ke 'gemini-2.5-pro' di file geminiService.");
+    // Error Handling yang Jujur
+    if (error.message?.includes("429")) {
+        throw new Error("Server AI sedang sibuk (Kuota Penuh). Tunggu 1-2 menit lalu coba lagi.");
     }
     throw new Error(error.message || "Gagal menganalisa dokumen.");
   }
