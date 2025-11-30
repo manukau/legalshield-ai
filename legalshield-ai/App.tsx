@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileUploader } from './components/FileUploader';
 import { ResultDisplay } from './components/ResultDisplay';
-import { analyzeContract } from './services/geminiService';
+import { analyzeContractStream } from './services/geminiService';
 import { AnalysisStatus } from './types';
 import { Loader2, CheckCircle2, ShieldCheck, AlertTriangle, Zap, Lock, BrainCircuit, X, ChevronRight, Activity } from 'lucide-react';
 
@@ -70,11 +70,21 @@ const App: React.FC = () => {
     if (!file) return;
     setStatus(AnalysisStatus.ANALYZING);
     setError(null);
-    setResult("");
+    setResult(""); // Kosongkan hasil sebelumnya
+
     try {
-      const analysisText = await analyzeContract(file);
-      setResult(analysisText);
+      // Panggil fungsi streaming
+      const stream = analyzeContractStream(file);
+
+      // Loop untuk membaca aliran data
+      for await (const chunk of stream) {
+        // Tambahkan potongan teks baru ke hasil yang sudah ada
+        setResult((prev) => prev + chunk);
+      }
+
+      // Setelah stream selesai
       setStatus(AnalysisStatus.COMPLETE);
+      
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Terjadi kesalahan saat menganalisa dokumen.");
@@ -306,6 +316,7 @@ const App: React.FC = () => {
 };
 
 export default App;
+
 
 
 
