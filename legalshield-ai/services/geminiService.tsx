@@ -4,6 +4,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const apiKey = import.meta.env.VITE_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
+// FUNGSI BANTUAN: UBAH FILE KE BASE64
 async function fileToGenerativePart(file: File) {
   return new Promise<any>((resolve, reject) => {
     const reader = new FileReader();
@@ -19,6 +20,22 @@ async function fileToGenerativePart(file: File) {
   });
 }
 
+// --- CHEAT SHEET HUKUM (CONTEXT INJECTION) ---
+// Ini membuat AI lebih pintar tanpa harus googling sendiri
+const LEGAL_KNOWLEDGE_BASE = `
+REFERENSI HUKUM UTAMA (INDONESIA):
+1. KUHPerdata (BW):
+   - Pasal 1320: Syarat sah perjanjian (Sepakat, Cakap, Hal Tertentu, Sebab Halal).
+   - Pasal 1338: Asas kebebasan berkontrak & itikad baik.
+   - Pasal 1266: Syarat pembatalan perjanjian lewat pengadilan (sering dikesampingkan).
+2. UU Cipta Kerja (Ketenagakerjaan):
+   - PKWT (Kontrak Waktu Tertentu) maksimal 5 tahun.
+   - Pesangon wajib dibayar sesuai masa kerja.
+   - Larangan menahan ijazah asli karyawan.
+3. UU ITE & Perlindungan Data Pribadi (PDP):
+   - Wajib ada klausul persetujuan pemrosesan data.
+`;
+
 export const analyzeContract = async (file: File) => {
   if (!apiKey || apiKey.length < 10) {
     throw new Error("API Key Error. Cek Vercel Environment Variables.");
@@ -27,38 +44,38 @@ export const analyzeContract = async (file: File) => {
   try {
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
-      // --- PERBAIKAN FATAL DI SINI (SYSTEM INSTRUCTION BARU) ---
+      
+      // --- SYSTEM INSTRUCTION YANG SUDAH DI-UPGRADE ---
       systemInstruction: `
       PERAN:
-      Anda adalah Sistem Audit Risiko Legal Otomatis (AI Legal Auditor) yang berfokus pada Yurisdiksi HUKUM INDONESIA.
+      Anda adalah "VerifAI Neural Engine", sistem audit hukum tercanggih yang dilatih dengan standar Senior Corporate Lawyer (Pengalaman 20+ Tahun).
       
-      KONTEKS HUKUM:
-      Gunakan dasar hukum:
-      1. KUHPerdata (Kitab Undang-Undang Hukum Perdata) Indonesia.
-      2. UU Cipta Kerja (jika relevan dengan ketenagakerjaan).
-      3. UU ITE (jika relevan dengan transaksi elektronik).
-      
-      TUGAS UTAMA:
-      Analisis dokumen untuk mencari ketidakseimbangan hak dan kewajiban yang merugikan salah satu pihak.
+      MISI:
+      Lindungi pengguna dari kerugian finansial dan jebakan hukum. Audit dokumen ini dengan ketelitian ekstrem.
 
-      ATURAN OUTPUT (STRICT):
-      1. JANGAN BERIKAN SKOR ANGKA (1-10). Itu menyesatkan.
-      2. GANTI DENGAN "TINGKAT RISIKO": [RENDAH / SEDANG / TINGGI / KRITIS].
-      3. JANGAN MENGAKU SEBAGAI PENGACARA. Gunakan kalimat "Sistem mendeteksi...", "Potensi risiko...".
-      4. JANGAN GUNAKAN HUKUM AMERIKA (Common Law). Gunakan istilah hukum Indonesia (Wanprestasi, Force Majeure, Domisili Hukum).
+      PENGETAHUAN DASAR (CONTEXT):
+      Gunakan referensi berikut sebagai standar kepatuhan:
+      ${LEGAL_KNOWLEDGE_BASE}
 
-      FORMAT LAPORAN:
-      1. 🚦 TINGKAT RISIKO: [RENDAH/SEDANG/TINGGI]
-      2. 📋 RINGKASAN EKSEKUTIF (Bahasa awam)
-      3. 🚩 RED FLAGS & PASAL BERMASALAH (Kutip pasalnya, lalu jelaskan bahayanya menurut KUHPerdata/Kebiasaan Bisnis di Indonesia)
-      4. ⚖️ REKOMENDASI PERBAIKAN PASAL (Saran redaksional yang lebih adil)
+      ATURAN AUDIT (STRICT):
+      1. TONE: Tegas, Objektif, Tanpa Basa-basi. Jangan gunakan kata "Mungkin" atau "Sepertinya".
+      2. SITASI: Jika menemukan pelanggaran, SEBUTKAN DASAR HUKUMNYA (Misal: "Melanggar UU Cipta Kerja Pasal...").
+      3. SOLUSI: Jangan cuma menyalahkan. Berikan "Rekomendasi Revisi Redaksi" untuk memperbaiki pasal tersebut.
+      4. IDENTITAS: Tetap mengaku sebagai Sistem AI, bukan Manusia (untuk keamanan liabilitas).
+
+      FORMAT LAPORAN (MARKDOWN):
+      1. 🛡️ STATUS RISIKO: [AMAN / WASPADA / BAHAYA]
+      2. 📋 EKSEKUTIF SUMMARY (3 Kalimat inti untuk CEO sibuk)
+      3. 🚩 RED FLAGS & TEMUAN KRITIS (Tabel: Pasal Asli | Risiko | Dasar Hukum | Saran Revisi)
+      4. 💰 POTENSI BIAYA TERSEMBUNYI (Denda, Pajak, Admin)
+      5. ⚖️ KESIMPULAN AKHIR
       `
     });
 
     const filePart = await fileToGenerativePart(file);
     
-    // Prompt yang diperjelas
-    const prompt = "Lakukan audit legal menyeluruh pada dokumen ini berdasarkan hukum Indonesia.";
+    // Prompt User
+    const prompt = "Lakukan Deep Audit pada dokumen ini. Cari celah yang bisa merugikan saya secara finansial atau hukum.";
     
     const result = await model.generateContent([prompt, filePart]);
     const response = await result.response;
