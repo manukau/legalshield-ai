@@ -43,7 +43,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
         heightLeft -= pageHeight;
       }
 
-      pdf.save('VERIFAI-Audit-Report.pdf');
+      pdf.save('VerifAI-Audit-Report.pdf');
     } catch (error) {
       console.error("Gagal download PDF:", error);
       alert("Maaf, gagal membuat PDF.");
@@ -109,9 +109,6 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
                       <p className="text-slate-400 text-xs font-mono tracking-widest uppercase opacity-80 hidden sm:block">
                         POWERED BY VERIFAI ENGINE
                       </p>
-                      <p className="text-slate-400 text-xs font-mono tracking-widest uppercase opacity-80 sm:hidden">
-                        NEURAL AI
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -135,33 +132,44 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
                   h1: ({node, ...props}) => (
                     <h1 className="text-2xl sm:text-3xl font-bold text-white mb-8 pb-4 border-b border-slate-800 flex items-center gap-3" {...props} />
                   ),
+                  
+                  // DESIGN BARU: H2 (Sub-Bab Utama seperti 'RED FLAGS')
                   h2: ({node, ...props}) => (
-                    <div className="mt-10 mb-6 group">
-                      <h2 className="text-lg sm:text-xl font-bold text-emerald-400 flex items-center gap-3 bg-emerald-950/30 p-3 rounded-lg border-l-4 border-emerald-500 group-hover:bg-emerald-950/50 transition-colors" {...props} />
+                    <div className="mt-12 mb-6">
+                      <h2 className="text-lg sm:text-xl font-bold text-emerald-400 flex items-center gap-3 uppercase tracking-wide border-b border-emerald-500/30 pb-2" {...props} />
                     </div>
                   ),
+
+                  // DESIGN BARU: H4 (Judul Per-Pasal / Card Red Flag)
+                  // Kita ubah #### menjadi Kotak Merah Elegan
+                  h4: ({node, ...props}) => (
+                    <div className="mt-8 mb-4 bg-rose-500/10 border-l-4 border-rose-500 p-3 rounded-r-lg">
+                      <h4 className="text-base sm:text-lg font-bold text-rose-200 flex items-center gap-2" {...props} />
+                    </div>
+                  ),
+
+                  // DESIGN BARU: Separator (Garis Pemisah antar pasal)
+                  hr: ({node, ...props}) => (
+                    <hr className="border-slate-800 my-8" {...props} />
+                  ),
+
                   h3: ({node, ...props}) => (
-                    <h3 className="text-base sm:text-lg font-semibold text-slate-200 mt-6 mb-3 ml-1 border-l-2 border-slate-700 pl-3" {...props} />
+                    <h3 className="text-base sm:text-lg font-semibold text-slate-200 mt-6 mb-3" {...props} />
                   ),
                   ul: ({node, ...props}) => (
-                    <ul className="space-y-3 text-slate-300 mb-6" {...props} />
+                    <ul className="space-y-2 text-slate-300 mb-6 ml-1" {...props} />
                   ),
                   li: ({node, ...props}) => (
                     <li className="flex items-start gap-3 leading-relaxed group text-sm sm:text-base" {...props}>
-                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-emerald-500 transition-colors flex-shrink-0"></span>
+                       <span className="mt-2 w-1 h-1 rounded-full bg-slate-500 group-hover:bg-emerald-500 transition-colors flex-shrink-0"></span>
                        <span>{props.children}</span>
                     </li>
                   ),
                   strong: ({node, ...props}) => (
-                    <strong className="font-semibold text-rose-400 bg-rose-500/10 px-1 py-0.5 rounded mx-0.5 border border-rose-500/20" {...props} />
+                    <strong className="font-semibold text-white bg-slate-800 px-1 rounded mx-0.5" {...props} />
                   ),
                   p: ({node, ...props}) => (
-                    <p className="text-slate-300 leading-relaxed mb-5 text-justify text-sm sm:text-base" {...props} />
-                  ),
-                  blockquote: ({node, ...props}) => (
-                    <div className="my-6 p-4 rounded-r-lg border-l-4 border-amber-500/50 bg-amber-500/5 text-amber-200/80 italic text-sm">
-                      {props.children}
-                    </div>
+                    <p className="text-slate-300 leading-relaxed mb-4 text-justify text-sm sm:text-base" {...props} />
                   )
                 }}
               >
@@ -170,20 +178,17 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
             </div>
           </div>
 
-          {/* FOOTER PDF DENGAN DISCLAIMER YANG DIPERKUAT */}
+          {/* FOOTER */}
           <div className="bg-slate-900/50 p-6 border-t border-white/5 backdrop-blur-sm">
              <div className="flex items-start gap-3 max-w-3xl mx-auto text-xs text-slate-500 text-justify bg-slate-800/50 p-4 rounded-lg border border-white/5">
                 <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
                 <p>
-                  <strong>DISCLAIMER & PENYANGKALAN TANGGUNG JAWAB:</strong><br/> 
-                  Analisis ini dihasilkan oleh kecerdasan buatan (AI) sebagai referensi awal berdasarkan konteks hukum umum di Indonesia (KUHPerdata/UU terkait). 
-                  Hasil ini <u>BUKAN</u> pengganti nasihat hukum profesional. 
-                  Pengembang aplikasi tidak bertanggung jawab atas kesalahan interpretasi AI, ketidakakuratan data, atau kerugian yang timbul akibat penggunaan informasi ini. 
-                  Pengguna wajib memverifikasi temuan ini dengan Advokat/Konsultan Hukum berlisensi sebelum mengambil keputusan.
+                  <strong>DISCLAIMER:</strong> Analisis ini dihasilkan oleh AI (VerifAI Engine) sebagai referensi awal mitigasi risiko dan 
+                  <u>BUKAN</u> pengganti nasihat hukum profesional. Pengguna wajib memverifikasi temuan ini dengan ahli hukum berlisensi.
                 </p>
              </div>
              <div className="text-center mt-6 text-slate-700 font-mono text-[10px] tracking-widest uppercase">
-                ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} • VERIFAI
+                ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} • VERIFAI SYSTEM
              </div>
           </div>
         </div>
@@ -191,4 +196,3 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
     </div>
   );
 };
-
