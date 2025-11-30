@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
 // @ts-ignore
 const apiKey = import.meta.env.VITE_API_KEY;
@@ -19,14 +19,12 @@ async function fileToGenerativePart(file: File) {
   });
 }
 
-// CONTEKAN HUKUM INDONESIA (VERSI C)
 const LEGAL_KNOWLEDGE_BASE = `
 DASAR HUKUM INDONESIA:
-1. KUHPerdata Pasal 1320 (Syarat Sah Perjanjian): Sepakat, Cakap, Hal Tertentu, Sebab Halal.
-2. KUHPerdata Pasal 1338 (Asas Kebebasan Berkontrak): Perjanjian berlaku sebagai undang-undang bagi pembuatnya.
-3. KUHPerdata Pasal 1266 (Pembatalan Lewat Pengadilan): Sering dikesampingkan, perlu diperhatikan.
-4. UU Cipta Kerja (Ketenagakerjaan) & UU ITE (Transaksi Elektronik).
-5. Asas Proporsionalitas: Hak dan kewajiban para pihak harus seimbang.
+1. KUHPerdata Pasal 1320 (Syarat Sah): Sepakat, Cakap, Hal Tertentu, Sebab Halal.
+2. KUHPerdata Pasal 1338 (Kebebasan Berkontrak) & 1266 (Pembatalan Lewat Pengadilan).
+3. UU Cipta Kerja & UU ITE.
+4. Asas Proporsionalitas & Itikad Baik.
 `;
 
 export const analyzeContract = async (file: File) => {
@@ -37,58 +35,71 @@ export const analyzeContract = async (file: File) => {
   try {
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
+      // --- PENGATURAN PENTING: MATIKAN SENSOR SENSITIF ---
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+      ],
       generationConfig: {
-        temperature: 0.0, // KREATIVITAS MATI (Hanya Fakta)
+        temperature: 0.1, // Sedikit naikan supaya lebih lancar
         topP: 0.8,
         topK: 40,
         maxOutputTokens: 8192,
       },
       systemInstruction: `
-      PERAN:
-      Anda adalah "VerifAI Neural Engine", auditor hukum spesialis Yurisdiksi Indonesia.
+      PERAN: Auditor Hukum AI "VerifAI".
+      DATABASE: ${LEGAL_KNOWLEDGE_BASE}
       
-      MISI:
-      Audit dokumen ini secara ketat. Temukan celah risiko hukum & finansial.
-
-      DATABASE PENGETAHUAN:
-      ${LEGAL_KNOWLEDGE_BASE}
-
-      ATURAN MUTLAK:
-      1. HANYA gunakan informasi yang ada di dokumen. JANGAN berhalusinasi.
-      2. JANGAN PERNAH GUNAKAN FORMAT TABEL.
-      3. Gunakan format "CARD LIST" (Daftar ke bawah) untuk Red Flags agar mudah dibaca.
-      4. TETAP mengaku sebagai Sistem AI, bukan Pengacara.
-
-      FORMAT OUTPUT (MARKDOWN):
-      1. 🛡️ STATUS RISIKO: [AMAN / WASPADA / BAHAYA]
+      ATURAN:
+      1. Audit dokumen ini.
+      2. Gunakan format "CARD LIST" (Daftar ke bawah) untuk Red Flags.
+      3. Bahasa tegas, profesional, Indonesia.
       
-      2. 📋 RINGKASAN EKSEKUTIF (Singkat & Padat)
-      
-      3. 🚩 RED FLAGS & TEMUAN KRITIS
-      (Ulangi format ini untuk setiap temuan):
-      #### [Judul Pasal / Isu]
-      * **Risiko:** [Penjelasan risiko...]
-      * **Dasar Hukum:** [Pasal/UU yang relevan]
-      * **Saran:** [Rekomendasi perbaikan]
-      ---
-      
+      FORMAT OUTPUT:
+      1. 🛡️ STATUS RISIKO: [AMAN/WASPADA/BAHAYA]
+      2. 📋 RINGKASAN EKSEKUTIF
+      3. 🚩 RED FLAGS (Format: #### [Judul] ... )
       4. 💰 POTENSI BIAYA TERSEMBUNYI
-      
       5. ⚖️ KESIMPULAN AKHIR
       `
     });
 
     const filePart = await fileToGenerativePart(file);
-    
-    const prompt = "Lakukan audit deep-scan pada dokumen ini. Identifikasi risiko hukum & finansial secara mendetail.";
+    const prompt = "Lakukan audit deep-scan pada dokumen ini. Cari risiko hukum.";
     
     const result = await model.generateContent([prompt, filePart]);
     const response = await result.response;
+    
+    // Cek apakah ada respon
+    if (!response || !response.text()) {
+      throw new Error("AI tidak memberikan respon. Coba dokumen lain.");
+    }
+
     return response.text();
 
   } catch (error: any) {
     console.error("Gemini Error:", error);
-    if (error.message?.includes("404")) throw new Error("Model AI sedang sibuk. Coba lagi.");
-    throw new Error("Gagal menganalisa. Pastikan file PDF tidak rusak/terkunci.");
+    // Pesan error yang lebih jelas buat user
+    if (error.message?.includes("SAFETY")) {
+      throw new Error("Dokumen ditolak oleh filter keamanan Google. Coba dokumen lain.");
+    }
+    if (error.message?.includes("404")) {
+      throw new Error("Model AI sedang sibuk/down. Tunggu 1 menit lalu coba lagi.");
+    }
+    throw new Error("Gagal menganalisa. Pastikan file PDF bisa dibaca.");
   }
 };
