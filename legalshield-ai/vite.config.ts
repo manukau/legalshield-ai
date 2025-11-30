@@ -1,16 +1,19 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
-  // Load env file based on `mode` in the current working directory.
-  const env = loadEnv(mode, process.cwd(), '');
-  
-  return {
-    plugins: [react()],
-    define: {
-      // Mencari key dari berbagai kemungkinan sumber environment variable
-      'process.env.API_KEY': JSON.stringify(env.API_KEY || env.VITE_API_KEY || process.env.API_KEY)
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    // Kita naikkan batas peringatan dari 500kb ke 1000kb (1MB)
+    // Agar peringatan "Chunk Size" hilang dan build lebih lancar
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'lucide-react', 'jspdf', 'html2canvas']
+        }
+      }
     }
-  }
+  },
 })
