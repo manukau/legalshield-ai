@@ -1,36 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VerifAI - Intelligent Contract Audit</title>
+    
+    <title>VerifAI - Audit Risiko Kontrak Otomatis</title>
+    <meta name="description" content="Lindungi bisnis Anda dari pasal jebakan. VerifAI menggunakan kecerdasan buatan (AI) untuk mengaudit kontrak sewa, kerjasama, dan dokumen legal dalam hitungan detik. Sesuai hukum Indonesia (KUHPerdata)." />
+    <meta name="keywords" content="audit kontrak, cek perjanjian, legal ai indonesia, review kontrak otomatis, hukum perdata, verifai, cekpasal, kontrak aman" />
+    <meta name="author" content="VerifAI Team" />
+    <meta name="theme-color" content="#020617" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://verifai-id.vercel.app/" />
+    <meta property="og:title" content="VerifAI - Cek Kontrak Aman atau Bahaya?" />
+    <meta property="og:description" content="Jangan asal tanda tangan! Scan dokumen Anda sekarang dan temukan risiko hukum tersembunyi dengan AI. Gratis." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=1200&auto=format&fit=crop" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
+      /* PENTING: Set background hitam agar tidak silau (White Flash) saat loading */
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #f3f4f6;
+        background-color: #020617; /* Warna Slate-950 */
+        color: #e2e8f0;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
-    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
-    "vite": "https://aistudiocdn.com/vite@^7.2.4",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
-  }
-}
-</script>
-</head>
+  </head>
+  
   <body>
     <div id="root"></div>
-    <!-- Menambahkan entry point module untuk Vite -->
+    
     <script type="module" src="/index.tsx"></script>
   </body>
-
 </html>
